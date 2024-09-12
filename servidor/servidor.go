@@ -6,9 +6,11 @@ import (
 	"sessao3/servidor/funcoesServer"
 )
 
+var ADRESS string = "localhost:22355"
+
 func main() {
 	// Escutando na porta 8080
-	ln, err := net.Listen("tcp", "172.16.103.4:8080")
+	ln, err := net.Listen("tcp", ADRESS)
 	if err != nil {
 		fmt.Println("Erro ao iniciar o servidor:", err)
 		return

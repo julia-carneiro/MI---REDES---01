@@ -1,9 +1,11 @@
 package funcoesCliente
 
 import (
+	//"bufio"
 	"encoding/json"
 	"fmt"
 	"net"
+	//"os"
 )
 
 var indiceCidade = map[int]string{
@@ -26,50 +28,75 @@ var rotas = map[string][]int{
 type Request int
 
 const (
-	GET Request = iota
-	POST
+	ROTAS Request = iota
+	COMPRA
+	CADASTRO
 )
 
-// type Compra struct {
-// 	nome    string
-// 	cpf     string
-// 	trechos [][]string
-// }
-
 type Compra struct {
-	nome    string
-	cpf     string
-	origem  string
-	destino string
+	nome    string 
+	cpf     string 
+	origem  string 
+	destino string 
 }
 
 type User struct {
-	nome string
-	cpf  string
+    Nome string `json:"Nome"`
+    Cpf  string `json:"Cpf"`
 }
-
-// var metodo Request = GET
-// fmt.Println(metodo.String())
 
 type Dados struct {
-	request      Request //Tipo de requisição
-	dadosCompra  *Compra //Caso seja um post, as informações da viagem e do passageiro
-	dadosUsuario *User   // Dados para cadastro do usuario
-
+    Request      Request  `json:"Request"`
+    DadosCompra  *Compra  `json:"DadosCompra"`
+    DadosUsuario *User    `json:"DadosUsuario"`
 }
 
-func Menu() {
+
+func Menu(conn net.Conn){
 	var operacao int
 	// Lendo entrada do usuário
 	fmt.Println("O que deseja fazer?\n1- Cadastrar usuário\n2- Ver rotas\n3- Comprar passagens")
-	fmt.Scanf(&operacao)
+	fmt.Scanf("%d", &operacao)
+
+	switch operacao {
+	case 1:
+		var nome, cpf string
+		fmt.Println("Digite seu nome:")
+		fmt.Scanf("%s", &nome)
+		fmt.Println("Digite seu CPF:")
+		fmt.Scanf("%s", &cpf)
+
+		Cadastrar(conn, nome, cpf)
+	case 2:
+		// Lendo entrada do usuário
+		var origem, destino string
+		fmt.Print("Digite a cidade de origem: ")
+		fmt.Scanf("%s", &origem)
+
+		fmt.Print("Digite o destino: ")
+		fmt.Scanf("%s", &destino)
+		
+		valido := VerificarRota(origem, destino)
+		if valido {
+			caminhos := EncontrarCaminho(origem, destino)
+			fmt.Println("Caminhos encontrados:", caminhos)
+		} else {
+			fmt.Println("Não há rota disponível entre as cidades.")
+		}
+	case 3:
+		// Função de compra ainda não implementada
+		fmt.Println("Função de compra ainda não implementada.")
+	default:
+		fmt.Println("Operação inválida.")
+	}
+
 }
 
 func SolicitarDados(conn net.Conn) {
 	dados := Dados{
-		request:      GET,
-		dadosCompra:  nil,
-		dadosUsuario: nil,
+		Request:      ROTAS,
+		DadosCompra:  nil,
+		DadosUsuario: nil,
 	}
 	// Converter os dados para JSON
 	jsonData, err := json.Marshal(dados)
@@ -98,15 +125,14 @@ func VerificarRota(origem string, destino string) bool {
 	existe_destino := false
 
 	// Encontrar os índices das cidades
-	for cidade, _ := range rotas {
+	for cidade := range rotas {
 		if origem == cidade {
 			existe_origem = true
-
 		}
 
 		if destino == cidade {
 			existe_destino = true
-			indice_destino = Buscarindice((cidade))
+			indice_destino = Buscarindice(cidade)
 		}
 	}
 
@@ -120,22 +146,24 @@ func VerificarRota(origem string, destino string) bool {
 
 func Cadastrar(conn net.Conn, nome string, cpf string) {
 	user := User{
-		nome: nome,
-		cpf:  cpf,
+		Nome: nome,
+		Cpf:  cpf,
 	}
 	dados := Dados{
-		request:      POST,
-		dadosCompra:  nil,
-		dadosUsuario: &user,
+		Request:      CADASTRO,
+		DadosCompra:  nil,
+		DadosUsuario: &user, // Deve ser um ponteiro
 	}
-
+	
+	//Converter dados para JSON
 	jsonData, err := json.Marshal(dados)
 	if err != nil {
 		fmt.Println("Erro ao converter para JSON:", err)
 		return
 	}
 
-	// Enviar o JSON ao servidor
+	// // Enviar o JSON ao servidor
+	fmt.Println("Enviando dados:", string(jsonData)) // Exibe o JSON como string
 	conn.Write(jsonData)
 	conn.Write([]byte("\n")) // Enviar uma nova linha para indicar o fim da mensagem
 
@@ -147,14 +175,12 @@ func Cadastrar(conn net.Conn, nome string, cpf string) {
 		return
 	}
 	fmt.Println("Resposta do servidor:", string(buffer[:n]))
-
 }
 
 func Comprar(caminhos [][]string, user User) {
-
+	// Função de compra ainda não implementada
 }
 
-// Encontrar todos os caminhos possíveis
 func EncontrarCaminho(origem, destino string) [][]string {
 	caminhos := [][]string{}
 	visitados := make(map[string]bool)
@@ -190,8 +216,8 @@ func EncontrarCaminho(origem, destino string) [][]string {
 }
 
 func Buscarindice(cidade string) int {
-	for i, cidadeincice := range indiceCidade { //busca o indice da cidade
-		if cidadeincice == cidade {
+	for i, cidadeindice := range indiceCidade { // busca o índice da cidade
+		if cidadeindice == cidade {
 			return i
 		}
 	}
