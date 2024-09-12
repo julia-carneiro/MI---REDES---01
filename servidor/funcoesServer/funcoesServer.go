@@ -20,7 +20,7 @@ var vagas = map[string][]int{
 }
 
 var rotas = map[string][]int{
-	"São Paulo":{1, 1, 1},
+	"São Paulo":{0, 1, 1},
 	"Salvador":{1, 1, 1},
 	"Recife":{1, 1, 1},
 }
@@ -42,17 +42,22 @@ func (s Request) String() string {
 	}
 	return ""
 }
-type CidadeInfo struct {
-	Nome  string `json:"nome"`
-	Vagas []int  `json:"vagas"`
-	Rotas []int  `json:"rotas"`
-}
+
+// type Compra struct {
+// 	nome    string
+// 	cpf     string
+// 	trechos [][]string
+// }
 
 type Compra struct {
 	nome    string
 	cpf     string
 	origem  string
 	destino string
+}
+type User struct{
+	nome string 
+	cpf string
 }
 
 // var metodo Request = GET
@@ -61,6 +66,7 @@ type Compra struct {
 type Dados struct {
 	request     Request //Tipo de requisição
 	dadosCompra *Compra //Caso seja um post, as informações da viagem e do passageiro
+	dadosUsuario *User // Dados para cadastro do usuario
 
 }
 
@@ -73,8 +79,6 @@ func ValidarCompra(info Compra ) bool {
 	// Encontrar os índices de origem e destino
 	for cidade,_ := range rotas {
 		if cidade == origem {
-			
-			
 			origemEncontrada = true		
 			
 		}
@@ -89,7 +93,7 @@ func ValidarCompra(info Compra ) bool {
 		return false
 	}
 
-	// Verificar se há vagas e atualizar
+	// Verificar se há vagas e atualizar quando há uma rota direta
 	if vagas[origem][indice_destino] > 0 {
 		vagas[origem][indice_destino] -= 1
 		return true
@@ -108,40 +112,7 @@ func Buscarindice(cidade string)int{
 	return -1
 }
 
-//Encontrar todos os caminhos possíveis
-func EncontrarCaminho(origem, destino string) [][]string {
-	caminhos := [][]string{}
-	visitados := make(map[string]bool)
-	fila := [][]string{{origem}}
 
-	for len(fila) > 0 {
-		caminhoAtual := fila[0]
-		fila = fila[1:]
-
-		ultimo := caminhoAtual[len(caminhoAtual)-1]
-
-		if ultimo == destino {
-			caminhos = append(caminhos, caminhoAtual)
-			continue
-		}
-
-		if visitados[ultimo] {
-			continue
-		}
-		visitados[ultimo] = true
-
-		for i, rota := range rotas[ultimo] {
-			if rota == 1 {
-				proximaCidade := indiceCidade[i]
-				if !visitados[proximaCidade] {
-					fila = append(fila, append(caminhoAtual, proximaCidade))
-				}
-			}
-		}
-	}
-
-	return caminhos
-}
 
 
 func Get() ([]byte, error) {
