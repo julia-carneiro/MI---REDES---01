@@ -157,6 +157,7 @@ func HandleConnection(conn net.Conn) {
 			conn.Write([]byte("Dados de usuário não fornecidos.\n"))
 			return
 		}
+		
 		conn.Write([]byte("Usuário cadastrado\n"))
 	default:
 		conn.Write([]byte("Tipo de requisição inválido.\n"))

@@ -1,11 +1,12 @@
 package funcoesCliente
 
 import (
-	//"bufio"
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"net"
-	//"os"
+	"os"
+	"strings"
 )
 
 var indiceCidade = map[int]string{
@@ -34,37 +35,47 @@ const (
 )
 
 type Compra struct {
-	nome    string 
-	cpf     string 
-	origem  string 
-	destino string 
+	nome    string
+	cpf     string
+	origem  string
+	destino string
 }
 
 type User struct {
-    Nome string `json:"Nome"`
-    Cpf  string `json:"Cpf"`
+	Nome string `json:"Nome"`
+	Cpf  string `json:"Cpf"`
 }
 
 type Dados struct {
-    Request      Request  `json:"Request"`
-    DadosCompra  *Compra  `json:"DadosCompra"`
-    DadosUsuario *User    `json:"DadosUsuario"`
+	Request      Request `json:"Request"`
+	DadosCompra  *Compra `json:"DadosCompra"`
+	DadosUsuario *User   `json:"DadosUsuario"`
 }
 
-
-func Menu(conn net.Conn){
+func Menu(conn net.Conn) {
 	var operacao int
+	
+
 	// Lendo entrada do usuário
 	fmt.Println("O que deseja fazer?\n1- Cadastrar usuário\n2- Ver rotas\n3- Comprar passagens")
-	fmt.Scanf("%d", &operacao)
+	fmt.Scanf("%d\n", &operacao)
 
 	switch operacao {
 	case 1:
 		var nome, cpf string
+		reader := bufio.NewReader(os.Stdin)
 		fmt.Println("Digite seu nome:")
-		fmt.Scanf("%s", &nome)
+		nome, _ = reader.ReadString('\n')
+		nome = strings.TrimSpace(nome)
+	
 		fmt.Println("Digite seu CPF:")
-		fmt.Scanf("%s", &cpf)
+		cpf, _ = reader.ReadString('\n')
+		cpf = strings.TrimSpace(cpf)
+
+		// fmt.Println("Digite seu nome:")
+		// fmt.Scanf("%s\n"&nome)
+		// fmt.Println("Digite seu CPF:")
+		// fmt.Scanln(&cpf)
 
 		Cadastrar(conn, nome, cpf)
 	case 2:
@@ -75,7 +86,7 @@ func Menu(conn net.Conn){
 
 		fmt.Print("Digite o destino: ")
 		fmt.Scanf("%s", &destino)
-		
+
 		valido := VerificarRota(origem, destino)
 		if valido {
 			caminhos := EncontrarCaminho(origem, destino)
@@ -154,7 +165,7 @@ func Cadastrar(conn net.Conn, nome string, cpf string) {
 		DadosCompra:  nil,
 		DadosUsuario: &user, // Deve ser um ponteiro
 	}
-	
+
 	//Converter dados para JSON
 	jsonData, err := json.Marshal(dados)
 	if err != nil {
