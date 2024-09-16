@@ -4,6 +4,7 @@ import (
 	//"bufio"
 	"fmt"
 	"net"
+
 	//"os"
 	//"strings"
 	"sessao3/cliente/funcoesCliente"
@@ -22,8 +23,6 @@ func main() {
 
 	funcoesCliente.Menu(conn)
 
-	
-
 	// // Lendo entrada do usuário
 	// reader := bufio.NewReader(os.Stdin)
 	// fmt.Print("Digite a cidade de origem: ")
@@ -38,7 +37,7 @@ func main() {
 	// if valido {
 	// 	// Enviando mensagem ao servidor
 	// 	fmt.Fprintf(conn, "%s,%s\n", origem, destino)
-	
+
 	// 	// Recebendo resposta do servidor
 	// 	response, _ := bufio.NewReader(conn).ReadString('\n')
 	// 	fmt.Println("Resposta do servidor:", response)

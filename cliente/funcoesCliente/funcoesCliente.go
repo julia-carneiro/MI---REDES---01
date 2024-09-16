@@ -4,27 +4,11 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net"
 	"os"
 	"strings"
 )
-
-var indiceCidade = map[int]string{
-	0: "São Paulo",
-	1: "Salvador",
-	2: "Recife",
-}
-var vagas = map[string][]int{
-	"São Paulo": {0, 2, 3},
-	"Salvador":  {1, 0, 1},
-	"Recife":    {1, 1, 0},
-}
-
-var rotas = map[string][]int{
-	"São Paulo": {0, 1, 1},
-	"Salvador":  {1, 1, 1},
-	"Recife":    {1, 1, 1},
-}
 
 type Request int
 
@@ -35,10 +19,9 @@ const (
 )
 
 type Compra struct {
-	nome    string
-	cpf     string
-	origem  string
-	destino string
+	Nome    string
+	Cpf     string
+	Caminho []string
 }
 
 type User struct {
@@ -52,9 +35,75 @@ type Dados struct {
 	DadosUsuario *User   `json:"DadosUsuario"`
 }
 
+// Rota representa uma rota entre duas cidades com uma quantidade de vagas e um peso.
+type Rota struct {
+	Destino string
+	Vagas   int
+	Peso    int
+}
+
+// Estrutura de dados para o grafo das rotas.
+var rotas = map[string][]Rota{
+	"São Paulo": {
+		{"Salvador", 4, 15},
+		{"Recife", 3, 20},
+		{"Feira", 1, 15},
+	},
+	"Salvador": {
+		{"São Paulo", 1, 10},
+		{"Recife", 2, 25},
+		{"Feira", 2, 5},
+	},
+	"Recife": {
+		{"São Paulo", 1, 20},
+		{"Salvador", 1, 25},
+	},
+	"Feira": {
+		{"Salvador", 1, 5},
+		{"Recife", 2, 10},
+	},
+	"Manaus": {
+		{"São Paulo", 1, 30},
+		{"Recife", 1, 40},
+	},
+}
+
+// Função para realizar a busca em profundidade para encontrar o caminho com o menor peso total.
+func buscaProfundidade(cidadeAtual, destino string, visitado map[string]bool, caminhoAtual []string, pesoAtual, menorPeso *int, melhorCaminho *[]string) {
+	if cidadeAtual == destino {
+		if pesoAtual != nil && menorPeso != nil && *pesoAtual < *menorPeso {
+			*menorPeso = *pesoAtual
+			*melhorCaminho = append([]string(nil), caminhoAtual...) // Copia o caminho atual para o melhor caminho
+		}
+		return
+	}
+
+	visitado[cidadeAtual] = true
+	for _, rota := range rotas[cidadeAtual] {
+		if !visitado[rota.Destino] {
+			caminhoAtual = append(caminhoAtual, rota.Destino)
+			*pesoAtual += rota.Peso
+			buscaProfundidade(rota.Destino, destino, visitado, caminhoAtual, pesoAtual, menorPeso, melhorCaminho)
+			*pesoAtual -= rota.Peso
+			caminhoAtual = caminhoAtual[:len(caminhoAtual)-1]
+		}
+	}
+	visitado[cidadeAtual] = false
+}
+
+func menorCaminhoDFS(inicio, fim string) ([]string, int) {
+	visitado := make(map[string]bool)
+	caminhoAtual := []string{inicio}
+	var melhorCaminho []string
+	var pesoAtual, menorPeso int
+	menorPeso = math.MaxInt32
+
+	buscaProfundidade(inicio, fim, visitado, caminhoAtual, &pesoAtual, &menorPeso, &melhorCaminho)
+	return melhorCaminho, menorPeso
+}
+
 func Menu(conn net.Conn) {
 	var operacao int
-	
 
 	// Lendo entrada do usuário
 	fmt.Println("O que deseja fazer?\n1- Cadastrar usuário\n2- Ver rotas\n3- Comprar passagens")
@@ -67,7 +116,7 @@ func Menu(conn net.Conn) {
 		fmt.Println("Digite seu nome:")
 		nome, _ = reader.ReadString('\n')
 		nome = strings.TrimSpace(nome)
-	
+
 		fmt.Println("Digite seu CPF:")
 		cpf, _ = reader.ReadString('\n')
 		cpf = strings.TrimSpace(cpf)
@@ -78,8 +127,30 @@ func Menu(conn net.Conn) {
 		// fmt.Scanln(&cpf)
 
 		Cadastrar(conn, nome, cpf)
+
 	case 2:
+
 		// Lendo entrada do usuário
+		var origem, destino string
+		fmt.Print("Digite a cidade de origem: ")
+		fmt.Scanf("%s\n", &origem)
+
+		fmt.Print("Digite o destino: ")
+		fmt.Scanf("%s\n", &destino)
+
+		valido := VerificarCidade(origem, destino)
+		if valido {
+			user := User{
+				Nome: "Júlia",
+				Cpf:  "093.234.234-23",
+			}
+			Comprar(conn, user, origem, destino)
+		} else {
+			fmt.Println("Não há rota disponível entre essas cidades.")
+		}
+
+	case 3:
+		// Função de compra ainda não implementada
 		var origem, destino string
 		fmt.Print("Digite a cidade de origem: ")
 		fmt.Scanf("%s", &origem)
@@ -87,18 +158,9 @@ func Menu(conn net.Conn) {
 		fmt.Print("Digite o destino: ")
 		fmt.Scanf("%s", &destino)
 
-		valido := VerificarRota(origem, destino)
-		if valido {
-			caminhos := EncontrarCaminho(origem, destino)
-			fmt.Println("Caminhos encontrados:", caminhos)
-		} else {
-			fmt.Println("Não há rota disponível entre as cidades.")
-		}
-	case 3:
-		// Função de compra ainda não implementada
-		fmt.Println("Função de compra ainda não implementada.")
 	default:
 		fmt.Println("Operação inválida.")
+
 	}
 
 }
@@ -130,8 +192,8 @@ func SolicitarDados(conn net.Conn) {
 	fmt.Println("Resposta do servidor:", string(buffer[:n]))
 }
 
-func VerificarRota(origem string, destino string) bool {
-	var indice_destino int
+func VerificarCidade(origem string, destino string) bool {
+	//var indice_destino int
 	existe_origem := false
 	existe_destino := false
 
@@ -143,13 +205,13 @@ func VerificarRota(origem string, destino string) bool {
 
 		if destino == cidade {
 			existe_destino = true
-			indice_destino = Buscarindice(cidade)
+			//indice_destino = Buscarindice(cidade)
 		}
 	}
 
 	// Verificar se ambas as cidades existem e se há uma rota
 	if existe_origem && existe_destino {
-		return rotas[origem][indice_destino] == 1
+		return true
 	}
 
 	return false
@@ -188,49 +250,47 @@ func Cadastrar(conn net.Conn, nome string, cpf string) {
 	fmt.Println("Resposta do servidor:", string(buffer[:n]))
 }
 
-func Comprar(caminhos [][]string, user User) {
-	// Função de compra ainda não implementada
-}
+func Comprar(conn net.Conn, user User, origem string, destino string) {
 
-func EncontrarCaminho(origem, destino string) [][]string {
-	caminhos := [][]string{}
-	visitados := make(map[string]bool)
-	fila := [][]string{{origem}}
+	caminho, _ := menorCaminhoDFS(origem, destino)
+	fmt.Printf("Rota encontrada - %s a %s: %v", origem, destino, caminho)
 
-	for len(fila) > 0 {
-		caminhoAtual := fila[0]
-		fila = fila[1:]
-
-		ultimo := caminhoAtual[len(caminhoAtual)-1]
-
-		if ultimo == destino {
-			caminhos = append(caminhos, caminhoAtual)
-			continue
-		}
-
-		if visitados[ultimo] {
-			continue
-		}
-		visitados[ultimo] = true
-
-		for i, rota := range rotas[ultimo] {
-			if rota == 1 {
-				proximaCidade := indiceCidade[i]
-				if !visitados[proximaCidade] {
-					fila = append(fila, append(caminhoAtual, proximaCidade))
-				}
-			}
-		}
+	compra := Compra{
+		Nome:    user.Nome,
+		Cpf:     user.Cpf,
+		Caminho: caminho,
 	}
 
-	return caminhos
-}
-
-func Buscarindice(cidade string) int {
-	for i, cidadeindice := range indiceCidade { // busca o índice da cidade
-		if cidadeindice == cidade {
-			return i
-		}
+	dados := Dados{
+		Request:      COMPRA,
+		DadosCompra:  &compra,
+		DadosUsuario: nil,
 	}
-	return -1
+
+	var resposta int
+	fmt.Print("Deseja realizar a compra?\n1- Sim\n2- Não")
+	fmt.Scanf("%d\n", resposta)
+
+	if resposta == 1 {
+		//Converter dados para JSON
+		jsonData, err := json.Marshal(dados)
+		if err != nil {
+			fmt.Println("Erro ao converter para JSON:", err)
+			return
+		}
+
+		// // Enviar o JSON ao servidor
+		fmt.Println("Enviando dados:", string(jsonData)) // Exibe o JSON como string
+		conn.Write(jsonData)
+		conn.Write([]byte("\n")) // Enviar uma nova linha para indicar o fim da mensagem
+
+		// Ler a resposta do servidor
+		buffer := make([]byte, 1024)
+		n, err := conn.Read(buffer)
+		if err != nil {
+			fmt.Println("Erro ao ler a resposta do servidor:", err)
+			return
+		}
+		fmt.Println("Resposta do servidor:", string(buffer[:n]))
+	}
 }

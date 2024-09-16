@@ -58,9 +58,9 @@ type User struct {
 }
 
 type Dados struct {
-	Request      Request  `json:"Request"`
-	DadosCompra  *Compra  `json:"DadosCompra"`
-	DadosUsuario *User    `json:"DadosUsuario"`
+	Request      Request `json:"Request"`
+	DadosCompra  *Compra `json:"DadosCompra"`
+	DadosUsuario *User   `json:"DadosUsuario"`
 }
 
 func ValidarCompra(info Compra) bool {
@@ -157,7 +157,7 @@ func HandleConnection(conn net.Conn) {
 			conn.Write([]byte("Dados de usuário não fornecidos.\n"))
 			return
 		}
-		
+
 		conn.Write([]byte("Usuário cadastrado\n"))
 	default:
 		conn.Write([]byte("Tipo de requisição inválido.\n"))
