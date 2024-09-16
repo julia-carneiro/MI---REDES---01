@@ -5,25 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"os"
 )
-
-var indiceCidade = map[int]string{
-	0: "São Paulo",
-	1: "Salvador",
-	2: "Recife",
-}
-
-var vagas = map[string][]int{
-	"São Paulo": {0, 2, 3},
-	"Salvador":  {1, 0, 1},
-	"Recife":    {1, 1, 0},
-}
-
-var rotas = map[string][]int{
-	"São Paulo": {0, 1, 1},
-	"Salvador":  {1, 1, 1},
-	"Recife":    {1, 1, 1},
-}
 
 type Request int
 
@@ -46,12 +29,10 @@ func (s Request) String() string {
 }
 
 type Compra struct {
-	Nome    string `json:"Nome"`
-	Cpf     string `json:"Cpf"`
-	Origem  string `json:"Origem"`
-	Destino string `json:"Destino"`
+	Nome    string   `json:"Nome"`
+	Cpf     string   `json:"Cpf"`
+	Caminho []string `json:"Caminho"`
 }
-
 type User struct {
 	Nome string `json:"Nome"`
 	Cpf  string `json:"Cpf"`
@@ -63,46 +44,66 @@ type Dados struct {
 	DadosUsuario *User   `json:"DadosUsuario"`
 }
 
+type Rota struct {
+	Destino string `json:"Destino"`
+	Vagas   int    `json:"Vagas"`
+	Peso    int    `json:"Peso"`
+}
+
+var rotas map[string][]Rota
+
+//Busca e lê o arquivos de rotas
+func BuscarArquivosRotas() map[string][]Rota {
+	// Defina o caminho do arquivo JSON
+	filePath := `C:\Users\thiag\OneDrive\Documentos\Meus projetos\MI---REDES---01\dados\rotas.json`
+
+	// Abra o arquivo
+	file, err := os.Open(filePath)
+	if err != nil {
+		fmt.Println("Erro ao abrir o arquivo:", err)
+		return nil
+	}
+	defer file.Close()
+
+	// Criar um mapa para armazenar as rotas
+	var rotas map[string][]Rota
+
+	// Decodificar o arquivo JSON para o mapa
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&rotas); err != nil {
+		fmt.Println("Erro ao decodificar o JSON:", err)
+		return nil
+	}
+	return rotas
+
+}
+
+// Verifica se há vagas nas rotas que o usuário deseja comprar
+// Depois é necessario subtrair o número de vagas
 func ValidarCompra(info Compra) bool {
-	var indice_destino int
-	var origemEncontrada, destinoEncontrado bool
-	origem := info.Origem
-	destino := info.Destino
-
-	for cidade := range rotas {
-		if cidade == origem {
-			origemEncontrada = true
+	rotas = BuscarArquivosRotas()
+	CompraValida := false
+	for i := 0; i < len(info.Caminho); i++ { //percorre as cidades da rota
+		if i+1 != len(info.Caminho) { // verifica se a cidade atual não é o destino final
+			for j := 0; j < len(rotas[info.Caminho[i]]); j++ { // percorre as cidades que a cidade atual faz rota
+				if rotas[info.Caminho[i]][j].Destino == info.Caminho[i+1] { // verifica a rota é a rota desejada
+					if rotas[info.Caminho[i]][j].Vagas > 0 { // caso seja a rota desejada verifica se há vagas
+						CompraValida = true
+					} else {
+						CompraValida = false
+					}
+				}
+			}
 		}
-		if cidade == destino {
-			indice_destino = Buscarindice(cidade)
-			destinoEncontrado = true
-		}
 	}
+	return CompraValida
 
-	if !origemEncontrada || !destinoEncontrado {
-		return false
-	}
-
-	if vagas[origem][indice_destino] > 0 {
-		vagas[origem][indice_destino] -= 1
-		return true
-	}
-
-	return false
 }
 
-func Buscarindice(cidade string) int {
-	for i, cidadeincice := range indiceCidade {
-		if cidadeincice == cidade {
-			return i
-		}
-	}
-	return -1
-}
-
+//Está errada, não funciona ainda
 func Get() ([]byte, error) {
 	dados := map[string]interface{}{
-		"vagas": vagas,
+
 		"rotas": rotas,
 	}
 
@@ -146,6 +147,7 @@ func HandleConnection(conn net.Conn) {
 		aprovado := ValidarCompra(*dados.DadosCompra)
 		var result string
 		if aprovado {
+			//Subtrair o numero de vagas nas rotas
 			result = "APROVADA"
 		} else {
 			result = "RECUSADA"

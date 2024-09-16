@@ -1,0 +1,14 @@
+[
+    {
+        "Nome": "João Silva",
+        "Cpf": "123.456.789-00"
+    },
+    {
+        "Nome": "Maria Oliveira",
+        "Cpf": "987.654.321-00"
+    },
+    {
+        "Nome": "Carlos Souza",
+        "Cpf": "111.222.333-44"
+    }
+]

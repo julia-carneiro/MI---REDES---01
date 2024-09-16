@@ -16,7 +16,7 @@ func main() {
 		return
 	}
 	defer ln.Close()
-	fmt.Println("Servidor iniciado na porta 8080...")
+	fmt.Printf("Servidor iniciado em: %s", ADRESS)
 
 	for {
 		// Aceitando conexões dos clientes

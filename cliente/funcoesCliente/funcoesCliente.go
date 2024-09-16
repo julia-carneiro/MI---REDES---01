@@ -106,7 +106,7 @@ func Menu(conn net.Conn) {
 	var operacao int
 
 	// Lendo entrada do usuário
-	fmt.Println("O que deseja fazer?\n1- Cadastrar usuário\n2- Ver rotas\n3- Comprar passagens")
+	fmt.Println("O que deseja fazer?\n1- Cadastrar usuário\n2- Comprar passagens\n3-sla ")
 	fmt.Scanf("%d\n", &operacao)
 
 	switch operacao {
@@ -127,16 +127,21 @@ func Menu(conn net.Conn) {
 		// fmt.Scanln(&cpf)
 
 		Cadastrar(conn, nome, cpf)
+		break
 
 	case 2:
 
 		// Lendo entrada do usuário
 		var origem, destino string
-		fmt.Print("Digite a cidade de origem: ")
-		fmt.Scanf("%s\n", &origem)
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Println("Digite a cidade de origem:")
+		origem, _ = reader.ReadString('\n')
+		origem = strings.TrimSpace(origem)
 
-		fmt.Print("Digite o destino: ")
-		fmt.Scanf("%s\n", &destino)
+		fmt.Println("Digite a cidade de destino:")
+		destino, _ = reader.ReadString('\n')
+		destino = strings.TrimSpace(destino)
+
 
 		valido := VerificarCidade(origem, destino)
 		if valido {
@@ -148,15 +153,11 @@ func Menu(conn net.Conn) {
 		} else {
 			fmt.Println("Não há rota disponível entre essas cidades.")
 		}
-
+		break
 	case 3:
 		// Função de compra ainda não implementada
-		var origem, destino string
-		fmt.Print("Digite a cidade de origem: ")
-		fmt.Scanf("%s", &origem)
-
-		fmt.Print("Digite o destino: ")
-		fmt.Scanf("%s", &destino)
+		
+		
 
 	default:
 		fmt.Println("Operação inválida.")
@@ -268,9 +269,8 @@ func Comprar(conn net.Conn, user User, origem string, destino string) {
 	}
 
 	var resposta int
-	fmt.Print("Deseja realizar a compra?\n1- Sim\n2- Não")
-	fmt.Scanf("%d\n", resposta)
-
+	fmt.Print("Deseja realizar a compra?\n1- Sim\n2- Não\n")
+	fmt.Scanf("%d\n", &resposta)
 	if resposta == 1 {
 		//Converter dados para JSON
 		jsonData, err := json.Marshal(dados)
