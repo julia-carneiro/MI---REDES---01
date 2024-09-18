@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path/filepath"
 )
 
 type Request int
@@ -51,9 +52,10 @@ type Rota struct {
 }
 
 var rotas map[string][]Rota
-var filePathRotas = `C:\Users\thiag\OneDrive\Documentos\Meus projetos\MI---REDES---01\dados\rotas.json`
+var filePathRotas = filepath.Join("dados", "rotas.json")
+var filePathUsers = filepath.Join("dados", "users.json")
 
-//Busca e lê o arquivos de rotas
+// Busca e lê o arquivos de rotas
 func BuscarArquivosRotas() map[string][]Rota {
 	// Defina o caminho do arquivo JSON
 	// filePath := `C:\Users\thiag\OneDrive\Documentos\Meus projetos\MI---REDES---01\dados\rotas.json`
@@ -76,20 +78,68 @@ func BuscarArquivosRotas() map[string][]Rota {
 		return nil
 	}
 	return rotas
-
 }
 
-func AtualizarVagas(info Compra){
+func CadastrarUsuario(novoUsuario User) error {
+	// Ler o conteúdo existente do arquivo
+	content, err := os.ReadFile(filePathUsers)
+	if err != nil {
+		if os.IsNotExist(err) {
+			// Se o arquivo não existir, inicialize uma lista vazia de usuários
+			content = []byte("[]")
+		} else {
+			return fmt.Errorf("erro ao ler o arquivo de usuários: %v", err)
+		}
+	}
+
+	// Tratar caso o arquivo esteja vazio
+	if len(content) == 0 {
+		content = []byte("[]")
+	}
+
+	// Decodificar o conteúdo do arquivo para uma lista de usuários
+	var users []User
+	err = json.Unmarshal(content, &users)
+	if err != nil {
+		return fmt.Errorf("erro ao decodificar JSON: %v", err)
+	}
+
+	// Verificar se o CPF já está cadastrado
+	for _, u := range users {
+		if u.Cpf == novoUsuario.Cpf {
+			return fmt.Errorf("usuário com CPF %s já está cadastrado", novoUsuario.Cpf)
+		}
+	}
+
+	// Adicionar o novo usuário à lista
+	users = append(users, novoUsuario)
+
+	// Converter a lista atualizada de volta para JSON
+	jsonData, err := json.MarshalIndent(users, "", "  ")
+	if err != nil {
+		return fmt.Errorf("erro ao converter dados para JSON: %v", err)
+	}
+
+	// Escrever o JSON atualizado no arquivo
+	err = os.WriteFile(filePathUsers, jsonData, 0644)
+	if err != nil {
+		return fmt.Errorf("erro ao escrever no arquivo de usuários: %v", err)
+	}
+
+	return nil
+}
+
+func AtualizarVagas(info Compra) {
 	for i := 0; i < len(info.Caminho); i++ { //percorre as cidades da rota
 		if i+1 != len(info.Caminho) { // verifica se a cidade atual não é o destino final
 			for j := 0; j < len(rotas[info.Caminho[i]]); j++ { // percorre as cidades que a cidade atual faz rota
 				if rotas[info.Caminho[i]][j].Destino == info.Caminho[i+1] { // verifica se a rota é a rota desejada
 					if rotas[info.Caminho[i]][j].Vagas > 0 { // caso seja a rota desejada verifica se há vagas
-						rotas[info.Caminho[i]][j].Vagas -=1// diminue uma vaga no trecho atual
-					} 
+						rotas[info.Caminho[i]][j].Vagas -= 1 // diminue uma vaga no trecho atual
+					}
+				}
 			}
 		}
-	}
 
 	}
 
@@ -175,9 +225,9 @@ func HandleConnection(conn net.Conn) {
 		jsonData, err := json.MarshalIndent(rotas, "", "  ")
 		if err != nil {
 			fmt.Println("Erro ao converter para JSON:", err)
-			
+
 		}
-		conn.Write(jsonData) // Envia os bytes diretamente
+		conn.Write(jsonData)     // Envia os bytes diretamente
 		conn.Write([]byte("\n")) // Enviar uma nova linha para indicar o fim da mensagem
 
 	case COMPRA:
@@ -198,12 +248,22 @@ func HandleConnection(conn net.Conn) {
 
 		conn.Write([]byte("Sua compra foi " + result + "\n"))
 	case CADASTRO:
+
 		if dados.DadosUsuario == nil {
 			conn.Write([]byte("Dados de usuário não fornecidos.\n"))
 			return
 		}
 
-		conn.Write([]byte("Usuário cadastrado\n"))
+		// Tentar cadastrar o usuário
+		err := CadastrarUsuario(*dados.DadosUsuario)
+		if err != nil {
+			conn.Write([]byte(fmt.Sprintf("Erro ao cadastrar usuário: %v\n", err)))
+			return
+		}
+
+		// Confirmar sucesso
+		conn.Write([]byte("Usuário cadastrado com sucesso.\n"))
+
 	default:
 		conn.Write([]byte("Tipo de requisição inválido.\n"))
 	}

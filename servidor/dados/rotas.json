@@ -2,12 +2,12 @@
   "Feira": [
     {
       "Destino": "Salvador",
-      "Vagas": 0,
+      "Vagas": 1,
       "Peso": 5
     },
     {
       "Destino": "Recife",
-      "Vagas": 2,
+      "Vagas": 0,
       "Peso": 10
     }
   ],
