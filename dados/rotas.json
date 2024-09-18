@@ -1,72 +1,72 @@
 {
-    "São Paulo": [
-        {
-            "Destino": "Salvador",
-            "Vagas": 4,
-            "Peso": 15
-        },
-        {
-            "Destino": "Recife",
-            "Vagas": 3,
-            "Peso": 20
-        },
-        {
-            "Destino": "Feira",
-            "Vagas": 1,
-            "Peso": 15
-        }
-    ],
-    "Salvador": [
-        {
-            "Destino": "São Paulo",
-            "Vagas": 1,
-            "Peso": 10
-        },
-        {
-            "Destino": "Recife",
-            "Vagas": 2,
-            "Peso": 25
-        },
-        {
-            "Destino": "Feira",
-            "Vagas": 2,
-            "Peso": 5
-        }
-    ],
-    "Recife": [
-        {
-            "Destino": "São Paulo",
-            "Vagas": 1,
-            "Peso": 20
-        },
-        {
-            "Destino": "Salvador",
-            "Vagas": 1,
-            "Peso": 25
-        }
-    ],
-    "Feira": [
-        {
-            "Destino": "Salvador",
-            "Vagas": 1,
-            "Peso": 5
-        },
-        {
-            "Destino": "Recife",
-            "Vagas": 2,
-            "Peso": 10
-        }
-    ],
-    "Manaus": [
-        {
-            "Destino": "São Paulo",
-            "Vagas": 1,
-            "Peso": 30
-        },
-        {
-            "Destino": "Recife",
-            "Vagas": 1,
-            "Peso": 40
-        }
-    ]
+  "Feira": [
+    {
+      "Destino": "Salvador",
+      "Vagas": 0,
+      "Peso": 5
+    },
+    {
+      "Destino": "Recife",
+      "Vagas": 2,
+      "Peso": 10
+    }
+  ],
+  "Manaus": [
+    {
+      "Destino": "São Paulo",
+      "Vagas": 1,
+      "Peso": 30
+    },
+    {
+      "Destino": "Recife",
+      "Vagas": 1,
+      "Peso": 40
+    }
+  ],
+  "Recife": [
+    {
+      "Destino": "São Paulo",
+      "Vagas": 1,
+      "Peso": 20
+    },
+    {
+      "Destino": "Salvador",
+      "Vagas": 1,
+      "Peso": 25
+    }
+  ],
+  "Salvador": [
+    {
+      "Destino": "São Paulo",
+      "Vagas": 1,
+      "Peso": 10
+    },
+    {
+      "Destino": "Recife",
+      "Vagas": 2,
+      "Peso": 25
+    },
+    {
+      "Destino": "Feira",
+      "Vagas": 2,
+      "Peso": 5
+    }
+  ],
+  "São Paulo": [
+    {
+      "Destino": "Salvador",
+      "Vagas": 4,
+      "Peso": 15
+    },
+    {
+      "Destino": "Recife",
+      "Vagas": 3,
+      "Peso": 20
+    },
+    {
+      "Destino": "Feira",
+      "Vagas": 0,
+      "Peso": 15
+    }
+  ]
 }

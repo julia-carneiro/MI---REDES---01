@@ -2,8 +2,8 @@ package main
 
 import (
 	//"bufio"
-	"fmt"
-	"net"
+	// "fmt"
+	// "net"
 
 	//"os"
 	//"strings"
@@ -13,15 +13,9 @@ import (
 var ADRESS string = "localhost:22355"
 
 func main() {
-	// Conectando ao servidor na porta 8080
-	conn, err := net.Dial("tcp", ADRESS)
-	if err != nil {
-		fmt.Println("Erro ao conectar ao servidor:", err)
-		return
-	}
-	defer conn.Close()
 
-	funcoesCliente.Menu(conn)
+
+	funcoesCliente.Menu(ADRESS)
 
 	// // Lendo entrada do usuário
 	// reader := bufio.NewReader(os.Stdin)

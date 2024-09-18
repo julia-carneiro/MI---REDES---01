@@ -51,14 +51,15 @@ type Rota struct {
 }
 
 var rotas map[string][]Rota
+var filePathRotas = `C:\Users\thiag\OneDrive\Documentos\Meus projetos\MI---REDES---01\dados\rotas.json`
 
 //Busca e lê o arquivos de rotas
 func BuscarArquivosRotas() map[string][]Rota {
 	// Defina o caminho do arquivo JSON
-	filePath := `C:\Users\thiag\OneDrive\Documentos\Meus projetos\MI---REDES---01\dados\rotas.json`
+	// filePath := `C:\Users\thiag\OneDrive\Documentos\Meus projetos\MI---REDES---01\dados\rotas.json`
 
 	// Abra o arquivo
-	file, err := os.Open(filePath)
+	file, err := os.Open(filePathRotas)
 	if err != nil {
 		fmt.Println("Erro ao abrir o arquivo:", err)
 		return nil
@@ -76,6 +77,43 @@ func BuscarArquivosRotas() map[string][]Rota {
 	}
 	return rotas
 
+}
+
+func AtualizarVagas(info Compra){
+	for i := 0; i < len(info.Caminho); i++ { //percorre as cidades da rota
+		if i+1 != len(info.Caminho) { // verifica se a cidade atual não é o destino final
+			for j := 0; j < len(rotas[info.Caminho[i]]); j++ { // percorre as cidades que a cidade atual faz rota
+				if rotas[info.Caminho[i]][j].Destino == info.Caminho[i+1] { // verifica se a rota é a rota desejada
+					if rotas[info.Caminho[i]][j].Vagas > 0 { // caso seja a rota desejada verifica se há vagas
+						rotas[info.Caminho[i]][j].Vagas -=1// diminue uma vaga no trecho atual
+					} 
+			}
+		}
+	}
+
+	}
+
+	// Converter dados para JSON
+	jsonData, err := json.MarshalIndent(rotas, "", "  ")
+	if err != nil {
+		fmt.Println("Erro ao converter dados para JSON:", err)
+		return
+	}
+
+	// Abrir ou criar o arquivo para sobrescrever
+	file, err := os.Create(filePathRotas)
+	if err != nil {
+		fmt.Println("Erro ao criar o arquivo:", err)
+		return
+	}
+	defer file.Close()
+
+	// Escrever JSON no arquivo
+	_, err = file.Write(jsonData)
+	if err != nil {
+		fmt.Println("Erro ao escrever no arquivo:", err)
+		return
+	}
 }
 
 // Verifica se há vagas nas rotas que o usuário deseja comprar
@@ -100,20 +138,16 @@ func ValidarCompra(info Compra) bool {
 
 }
 
-//Está errada, não funciona ainda
-func Get() ([]byte, error) {
-	dados := map[string]interface{}{
+// func Get() ([]byte, error) {
+// 	rotas := BuscarArquivosRotas()
 
-		"rotas": rotas,
-	}
-
-	jsonData, err := json.MarshalIndent(dados, "", "  ")
-	if err != nil {
-		fmt.Println("Erro ao converter para JSON:", err)
-		return nil, err
-	}
-	return jsonData, nil
-}
+// 	jsonData, err := json.MarshalIndent(rotas, "", "  ")
+// 	if err != nil {
+// 		fmt.Println("Erro ao converter para JSON:", err)
+// 		return nil, err
+// 	}
+// 	return jsonData, nil
+// }
 
 func HandleConnection(conn net.Conn) {
 	defer conn.Close()
@@ -136,8 +170,16 @@ func HandleConnection(conn net.Conn) {
 
 	switch dados.Request {
 	case ROTAS:
-		info, _ := Get()
-		conn.Write(info) // Envia os bytes diretamente
+		rotas := BuscarArquivosRotas()
+
+		jsonData, err := json.MarshalIndent(rotas, "", "  ")
+		if err != nil {
+			fmt.Println("Erro ao converter para JSON:", err)
+			
+		}
+		conn.Write(jsonData) // Envia os bytes diretamente
+		conn.Write([]byte("\n")) // Enviar uma nova linha para indicar o fim da mensagem
+
 	case COMPRA:
 		if dados.DadosCompra == nil {
 			conn.Write([]byte("Dados de compra não fornecidos.\n"))
@@ -148,6 +190,7 @@ func HandleConnection(conn net.Conn) {
 		var result string
 		if aprovado {
 			//Subtrair o numero de vagas nas rotas
+			AtualizarVagas(*dados.DadosCompra)
 			result = "APROVADA"
 		} else {
 			result = "RECUSADA"

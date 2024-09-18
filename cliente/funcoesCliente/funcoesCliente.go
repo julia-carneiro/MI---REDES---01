@@ -43,30 +43,7 @@ type Rota struct {
 }
 
 // Estrutura de dados para o grafo das rotas.
-var rotas = map[string][]Rota{
-	"São Paulo": {
-		{"Salvador", 4, 15},
-		{"Recife", 3, 20},
-		{"Feira", 1, 15},
-	},
-	"Salvador": {
-		{"São Paulo", 1, 10},
-		{"Recife", 2, 25},
-		{"Feira", 2, 5},
-	},
-	"Recife": {
-		{"São Paulo", 1, 20},
-		{"Salvador", 1, 25},
-	},
-	"Feira": {
-		{"Salvador", 1, 5},
-		{"Recife", 2, 10},
-	},
-	"Manaus": {
-		{"São Paulo", 1, 30},
-		{"Recife", 1, 40},
-	},
-}
+var rotas  map[string][]Rota
 
 // Função para realizar a busca em profundidade para encontrar o caminho com o menor peso total.
 func buscaProfundidade(cidadeAtual, destino string, visitado map[string]bool, caminhoAtual []string, pesoAtual, menorPeso *int, melhorCaminho *[]string) {
@@ -102,8 +79,9 @@ func menorCaminhoDFS(inicio, fim string) ([]string, int) {
 	return melhorCaminho, menorPeso
 }
 
-func Menu(conn net.Conn) {
+func Menu(ADRESS string) {
 	var operacao int
+	var conn net.Conn  
 
 	// Lendo entrada do usuário
 	fmt.Println("O que deseja fazer?\n1- Cadastrar usuário\n2- Comprar passagens\n3-sla ")
@@ -142,14 +120,18 @@ func Menu(conn net.Conn) {
 		destino, _ = reader.ReadString('\n')
 		destino = strings.TrimSpace(destino)
 
-
+		conn = ConectarServidor(ADRESS)
+		BuscarDados(conn)
+		defer conn.Close()
 		valido := VerificarCidade(origem, destino)
 		if valido {
 			user := User{
 				Nome: "Júlia",
 				Cpf:  "093.234.234-23",
 			}
+			conn = ConectarServidor(ADRESS)
 			Comprar(conn, user, origem, destino)
+			defer conn.Close()
 		} else {
 			fmt.Println("Não há rota disponível entre essas cidades.")
 		}
@@ -166,6 +148,53 @@ func Menu(conn net.Conn) {
 
 }
 
+func ConectarServidor(ADRESS string)net.Conn{
+	// Conectando ao servidor na porta 8080
+	conn, err := net.Dial("tcp", ADRESS)
+	if err != nil {
+		fmt.Println("Erro ao conectar ao servidor:", err)
+		return nil
+	}
+	
+	return conn
+}
+func BuscarDados(conn net.Conn){
+	dados := Dados{
+		Request:      ROTAS,
+		DadosCompra:  nil,
+		DadosUsuario: nil,
+	}
+
+	//Converter dados para JSON
+	jsonData, err := json.Marshal(dados)
+	if err != nil {
+		fmt.Println("Erro ao converter para JSON:", err)
+		return
+	}
+
+	// // Enviar o JSON ao servidor
+	// fmt.Println("Enviando dados:", string(jsonData)) // Exibe o JSON como string
+	conn.Write(jsonData)
+	conn.Write([]byte("\n")) // Enviar uma nova linha para indicar o fim da mensagem
+
+	// Ler a resposta do servidor
+	buffer := make([]byte, 1024)
+	n, err := conn.Read(buffer)
+	if err != nil {
+		fmt.Println("Erro ao ler a resposta do servidor:", err)
+		return
+	}
+	// fmt.Println("Resposta do servidor:", string(buffer[:n]))
+
+	// Desserializar o JSON recebido
+	err = json.Unmarshal(buffer[:n], &rotas)
+	if err != nil {
+		fmt.Println("Erro ao converter JSON para estrutura:", err)
+		return
+	}
+	// Exibir os dados convertidos
+	// fmt.Println("Dados convertidos:", rotas)
+}
 func SolicitarDados(conn net.Conn) {
 	dados := Dados{
 		Request:      ROTAS,
