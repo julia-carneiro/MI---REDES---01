@@ -107,7 +107,7 @@ func Menu(ADRESS string) {
 	}
 
 	// Lendo entrada do usuário
-	fmt.Println("O que deseja fazer?\n1- Comprar passagens\n3-Ver passagens compradas ")
+	fmt.Println("O que deseja fazer?\n1- Comprar passagens\n2-Ver passagens compradas ")
 	fmt.Scanf("%d\n", &operacao)
 
 	switch operacao {
