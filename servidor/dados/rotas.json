@@ -2,70 +2,70 @@
   "Feira": [
     {
       "Destino": "Salvador",
-      "Vagas": 1,
+      "Vagas": 7,
       "Peso": 5
     },
     {
       "Destino": "Recife",
-      "Vagas": 0,
+      "Vagas": 5,
       "Peso": 10
     }
   ],
   "Manaus": [
     {
       "Destino": "São Paulo",
-      "Vagas": 1,
+      "Vagas": 10,
       "Peso": 30
     },
     {
       "Destino": "Recife",
-      "Vagas": 1,
+      "Vagas": 10,
       "Peso": 40
     }
   ],
   "Recife": [
     {
       "Destino": "São Paulo",
-      "Vagas": 1,
+      "Vagas": 11,
       "Peso": 20
     },
     {
       "Destino": "Salvador",
-      "Vagas": 1,
+      "Vagas": 21,
       "Peso": 25
     }
   ],
   "Salvador": [
     {
       "Destino": "São Paulo",
-      "Vagas": 1,
+      "Vagas": 18,
       "Peso": 10
     },
     {
       "Destino": "Recife",
-      "Vagas": 2,
+      "Vagas": 22,
       "Peso": 25
     },
     {
       "Destino": "Feira",
-      "Vagas": 2,
+      "Vagas": 22,
       "Peso": 5
     }
   ],
   "São Paulo": [
     {
       "Destino": "Salvador",
-      "Vagas": 4,
+      "Vagas": 20,
       "Peso": 15
     },
     {
       "Destino": "Recife",
-      "Vagas": 3,
+      "Vagas": 20,
       "Peso": 20
     },
     {
       "Destino": "Feira",
-      "Vagas": 0,
+      "Vagas": 20,
       "Peso": 15
     }
   ]

@@ -15,6 +15,7 @@ const (
 	ROTAS Request = iota
 	COMPRA
 	CADASTRO
+	LERCOMPRAS
 )
 
 func (s Request) String() string {
@@ -25,6 +26,8 @@ func (s Request) String() string {
 		return "COMPRA"
 	case CADASTRO:
 		return "CADASTRO"
+	case LERCOMPRAS:
+		return "LERCOMPRAS"
 	}
 	return "DESCONHECIDO"
 }
@@ -54,6 +57,79 @@ type Rota struct {
 var rotas map[string][]Rota
 var filePathRotas = filepath.Join("dados", "rotas.json")
 var filePathUsers = filepath.Join("dados", "users.json")
+var filePathCompras = filepath.Join("dados", "compras.json")
+
+func SalvarCompra(compra Compra) error {
+	// Ler o conteúdo existente do arquivo de compras
+	content, err := os.ReadFile(filePathCompras)
+	if err != nil {
+		if os.IsNotExist(err) {
+			// Se o arquivo não existir, inicialize uma lista vazia de compras
+			content = []byte("[]")
+		} else {
+			return fmt.Errorf("erro ao ler o arquivo de compras: %v", err)
+		}
+	}
+
+	// Tratar caso o arquivo esteja vazio
+	if len(content) == 0 {
+		content = []byte("[]")
+	}
+
+	// Decodificar o conteúdo do arquivo para uma lista de compras
+	var compras []struct {
+		Nome    string     `json:"Nome"`
+		Cpf     string     `json:"Cpf"`
+		Caminho [][]string `json:"Caminho"`
+	}
+	err = json.Unmarshal(content, &compras)
+	if err != nil {
+		return fmt.Errorf("erro ao decodificar JSON: %v", err)
+	}
+
+	// Verificar se já existe uma entrada para o CPF fornecido
+	var usuarioExistente *struct {
+		Nome    string     `json:"Nome"`
+		Cpf     string     `json:"Cpf"`
+		Caminho [][]string `json:"Caminho"`
+	}
+	for i, c := range compras {
+		if c.Cpf == compra.Cpf {
+			usuarioExistente = &compras[i]
+			break
+		}
+	}
+
+	if usuarioExistente != nil {
+		// Adicionar a nova rota à lista existente
+		usuarioExistente.Caminho = append(usuarioExistente.Caminho, compra.Caminho)
+	} else {
+		// Adicionar nova compra se não houver entrada para o CPF
+		compras = append(compras, struct {
+			Nome    string     `json:"Nome"`
+			Cpf     string     `json:"Cpf"`
+			Caminho [][]string `json:"Caminho"`
+		}{
+			Nome:    compra.Nome,
+			Cpf:     compra.Cpf,
+			Caminho: [][]string{compra.Caminho},
+		})
+	}
+
+	// Converter a lista atualizada de volta para JSON
+	jsonData, err := json.MarshalIndent(compras, "", "  ")
+	if err != nil {
+		return fmt.Errorf("erro ao converter dados para JSON: %v", err)
+	}
+
+	// Escrever o JSON atualizado no arquivo
+	err = os.WriteFile(filePathCompras, jsonData, 0644)
+	if err != nil {
+		return fmt.Errorf("erro ao escrever no arquivo de compras: %v", err)
+	}
+
+	return nil
+}
 
 // Busca e lê o arquivos de rotas
 func BuscarArquivosRotas() map[string][]Rota {
@@ -241,6 +317,14 @@ func HandleConnection(conn net.Conn) {
 		if aprovado {
 			//Subtrair o numero de vagas nas rotas
 			AtualizarVagas(*dados.DadosCompra)
+
+			// Salvar a compra no arquivo "compras.json"
+			err := SalvarCompra(*dados.DadosCompra)
+			if err != nil {
+				conn.Write([]byte(fmt.Sprintf("Erro ao salvar a compra: %v\n", err)))
+				return
+			}
+
 			result = "APROVADA"
 		} else {
 			result = "RECUSADA"
@@ -263,6 +347,8 @@ func HandleConnection(conn net.Conn) {
 
 		// Confirmar sucesso
 		conn.Write([]byte("Usuário cadastrado com sucesso.\n"))
+
+	case LERCOMPRAS:
 
 	default:
 		conn.Write([]byte("Tipo de requisição inválido.\n"))

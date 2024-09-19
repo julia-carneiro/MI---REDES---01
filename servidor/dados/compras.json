@@ -1,0 +1,51 @@
+[
+  {
+    "Nome": "Júlia",
+    "Cpf": "093.234.234-23",
+    "Caminho": [
+      [
+        "São Paulo",
+        "Recife"
+      ],
+      [
+        "São Paulo",
+        "Salvador"
+      ]
+    ]
+  },
+  {
+    "Nome": "Julia",
+    "Cpf": "09320",
+    "Caminho": [
+      [
+        "Feira",
+        "Salvador"
+      ]
+    ]
+  },
+  {
+    "Nome": "teste",
+    "Cpf": "23",
+    "Caminho": [
+      [
+        "Feira",
+        "Salvador",
+        "São Paulo"
+      ],
+      [
+        "Salvador",
+        "São Paulo"
+      ]
+    ]
+  },
+  {
+    "Nome": "juliaaaa",
+    "Cpf": "2",
+    "Caminho": [
+      [
+        "Feira",
+        "Salvador"
+      ]
+    ]
+  }
+]

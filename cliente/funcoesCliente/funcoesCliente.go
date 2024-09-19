@@ -16,6 +16,7 @@ const (
 	ROTAS Request = iota
 	COMPRA
 	CADASTRO
+	LERCOMPRAS
 )
 
 type Compra struct {
@@ -83,34 +84,34 @@ func Menu(ADRESS string) {
 	var operacao int
 	var conn net.Conn
 
+	//Logar
+	fmt.Println("----- Faça login/cadastro-----")
+
+	var nome, cpf string
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("Digite seu nome:")
+	nome, _ = reader.ReadString('\n')
+	nome = strings.TrimSpace(nome)
+
+	fmt.Println("Digite seu CPF:")
+	cpf, _ = reader.ReadString('\n')
+	cpf = strings.TrimSpace(cpf)
+
+	conn = ConectarServidor(ADRESS)
+	Cadastrar(conn, nome, cpf)
+	defer conn.Close()
+
+	user := User{
+		Nome: nome,
+		Cpf:  cpf,
+	}
+
 	// Lendo entrada do usuário
-	fmt.Println("O que deseja fazer?\n1- Cadastrar usuário\n2- Comprar passagens\n3-sla ")
+	fmt.Println("O que deseja fazer?\n1- Comprar passagens\n3-Ver passagens compradas ")
 	fmt.Scanf("%d\n", &operacao)
 
 	switch operacao {
 	case 1:
-		var nome, cpf string
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Println("Digite seu nome:")
-		nome, _ = reader.ReadString('\n')
-		nome = strings.TrimSpace(nome)
-
-		fmt.Println("Digite seu CPF:")
-		cpf, _ = reader.ReadString('\n')
-		cpf = strings.TrimSpace(cpf)
-
-		// fmt.Println("Digite seu nome:")
-		// fmt.Scanf("%s\n"&nome)
-		// fmt.Println("Digite seu CPF:")
-		// fmt.Scanln(&cpf)
-
-		conn = ConectarServidor(ADRESS)
-		Cadastrar(conn, nome, cpf)
-		defer conn.Close()
-		break
-
-	case 2:
-
 		// Lendo entrada do usuário
 		var origem, destino string
 		reader := bufio.NewReader(os.Stdin)
@@ -125,20 +126,12 @@ func Menu(ADRESS string) {
 		conn = ConectarServidor(ADRESS)
 		BuscarDados(conn)
 		defer conn.Close()
-		//valido := VerificarCidade(origem, destino)
-		//if valido {
-		user := User{
-			Nome: "Júlia",
-			Cpf:  "093.234.234-23",
-		}
+
 		conn = ConectarServidor(ADRESS)
 		Comprar(conn, user, origem, destino)
 		defer conn.Close()
-		//} else {
-		//fmt.Println("Não há rota disponível entre essas cidades.")
-		//}
-		break
-	case 3:
+
+	case 2:
 		// Função de compra ainda não implementada
 
 	default:
