@@ -132,8 +132,9 @@ func Menu(ADRESS string) {
 		defer conn.Close()
 
 	case 2:
-		// Função de compra ainda não implementada
-
+		conn = ConectarServidor(ADRESS)
+		VerPassagensCompradas(conn, user.Cpf)
+		defer conn.Close()
 	default:
 		fmt.Println("Operação inválida.")
 
@@ -320,4 +321,38 @@ func Comprar(conn net.Conn, user User, origem string, destino string) {
 	} else {
 		fmt.Printf("Rota não encontrada")
 	}
+}
+
+func VerPassagensCompradas(conn net.Conn, cpf string) {
+	// Preparar a solicitação para ler as compras
+	user := User{
+		Cpf: cpf,
+	}
+	dados := Dados{
+		Request:      LERCOMPRAS,
+		DadosCompra:  nil,
+		DadosUsuario: &user, // Deve ser um ponteiro
+	}
+
+	// Converter dados para JSON
+	jsonData, err := json.Marshal(dados)
+	if err != nil {
+		fmt.Println("Erro ao converter para JSON:", err)
+		return
+	}
+
+	// Enviar o JSON ao servidor
+	fmt.Println("Enviando dados:", string(jsonData)) // Exibe o JSON como string
+	conn.Write(jsonData)
+	conn.Write([]byte("\n")) // Enviar uma nova linha para indicar o fim da mensagem
+
+	// Ler a resposta do servidor
+	buffer := make([]byte, 4096) // Aumentar o buffer se necessário
+	n, err := conn.Read(buffer)
+	if err != nil {
+		fmt.Println("Erro ao ler a resposta do servidor:", err)
+		return
+	}
+	fmt.Println("Passagens Compradas:")
+	fmt.Println(string(buffer[:n]))
 }

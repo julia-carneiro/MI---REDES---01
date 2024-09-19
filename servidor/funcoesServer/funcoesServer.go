@@ -131,6 +131,45 @@ func SalvarCompra(compra Compra) error {
 	return nil
 }
 
+func LerCompras(cpf string) ([][]string, error) {
+	// Ler o conteúdo do arquivo de compras
+	content, err := os.ReadFile(filePathCompras)
+	if err != nil {
+		if os.IsNotExist(err) {
+			// Se o arquivo não existir, retornar uma lista vazia de compras
+			return nil, nil
+		}
+		return nil, fmt.Errorf("erro ao ler o arquivo de compras: %v", err)
+	}
+
+	// Tratar caso o arquivo esteja vazio
+	if len(content) == 0 {
+		return nil, nil
+	}
+
+	// Decodificar o conteúdo do arquivo para uma lista de compras
+	var compras []struct {
+		Nome    string     `json:"Nome"`
+		Cpf     string     `json:"Cpf"`
+		Caminho [][]string `json:"Caminho"`
+	}
+	err = json.Unmarshal(content, &compras)
+	if err != nil {
+		return nil, fmt.Errorf("erro ao decodificar JSON: %v", err)
+	}
+
+	// Procurar a compra com o CPF fornecido
+	for _, c := range compras {
+		if c.Cpf == cpf {
+			// Retornar a lista de rotas do usuário encontrado
+			return c.Caminho, nil
+		}
+	}
+
+	// Se o usuário não for encontrado, retornar uma lista vazia
+	return nil, nil
+}
+
 // Busca e lê o arquivos de rotas
 func BuscarArquivosRotas() map[string][]Rota {
 	// Defina o caminho do arquivo JSON
@@ -349,6 +388,35 @@ func HandleConnection(conn net.Conn) {
 		conn.Write([]byte("Operação realizada com sucesso.\n"))
 
 	case LERCOMPRAS:
+		if dados.DadosUsuario == nil {
+			conn.Write([]byte("Dados de usuário não fornecidos.\n"))
+			return
+		}
+
+		// Supondo que DadosUsuario contém o CPF do usuário
+		cpf := dados.DadosUsuario.Cpf
+		if cpf == "" {
+			conn.Write([]byte("CPF não fornecido.\n"))
+			return
+		}
+
+		// Ler as compras do usuário
+		compras, err := LerCompras(cpf)
+		if err != nil {
+			conn.Write([]byte(fmt.Sprintf("Erro ao ler as compras: %v\n", err)))
+			return
+		}
+
+		// Converter as compras para JSON
+		jsonData, err := json.MarshalIndent(compras, "", "  ")
+		if err != nil {
+			conn.Write([]byte(fmt.Sprintf("Erro ao converter dados para JSON: %v\n", err)))
+			return
+		}
+
+		// Enviar os dados para o cliente
+		conn.Write(jsonData)
+		conn.Write([]byte("\n")) // Enviar uma nova linha para indicar o fim da mensagem
 
 	default:
 		conn.Write([]byte("Tipo de requisição inválido.\n"))
