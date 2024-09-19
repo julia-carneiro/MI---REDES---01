@@ -180,12 +180,12 @@ func CadastrarUsuario(novoUsuario User) error {
 		return fmt.Errorf("erro ao decodificar JSON: %v", err)
 	}
 
-	// Verificar se o CPF já está cadastrado
-	for _, u := range users {
-		if u.Cpf == novoUsuario.Cpf {
-			return fmt.Errorf("usuário com CPF %s já está cadastrado", novoUsuario.Cpf)
-		}
-	}
+	// // Verificar se o CPF já está cadastrado
+	// for _, u := range users {
+	// 	if u.Cpf == novoUsuario.Cpf {
+	// 		return fmt.Errorf("Logando com CPF %s", novoUsuario.Cpf)
+	// 	}
+	// }
 
 	// Adicionar o novo usuário à lista
 	users = append(users, novoUsuario)
@@ -346,7 +346,7 @@ func HandleConnection(conn net.Conn) {
 		}
 
 		// Confirmar sucesso
-		conn.Write([]byte("Usuário cadastrado com sucesso.\n"))
+		conn.Write([]byte("Operação realizada com sucesso.\n"))
 
 	case LERCOMPRAS:
 
