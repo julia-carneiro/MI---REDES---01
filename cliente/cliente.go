@@ -1,41 +1,47 @@
 package main
 
 import (
-	//"bufio"
-	// "fmt"
-	// "net"
-
-	//"os"
-	//"strings"
+	"bufio"
+	"fmt"
+	"net"
+	"os"
+	"strings"
 	"sessao3/cliente/funcoesCliente"
 )
 
 var ADRESS string = "localhost:22355"
+// type User struct {
+// 	Cpf  string `json:"Cpf"`
+// }
 
 func main() {
+	var cpf_valido = true
 
+	for cpf_valido{
+		//Logar
+		fmt.Println("----- Faça login/cadastro-----")
+		var conn net.Conn
 
-	funcoesCliente.Menu(ADRESS)
+		var  cpf string
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Println("Digite seu CPF:")
+		cpf, _ = reader.ReadString('\n')
+		cpf = strings.TrimSpace(cpf)
 
-	// // Lendo entrada do usuário
-	// reader := bufio.NewReader(os.Stdin)
-	// fmt.Print("Digite a cidade de origem: ")
-	// origem, _ := reader.ReadString('\n')
-	// origem = strings.TrimSpace(origem)
+		conn = funcoesCliente.ConectarServidor(ADRESS)
+		funcoesCliente.Cadastrar(conn, cpf)
+		defer conn.Close()
 
-	// fmt.Print("Digite o destino: ")
-	// destino, _ := reader.ReadString('\n')
-	// destino = strings.TrimSpace(destino)
+		user := funcoesCliente.User{
+			Cpf:  cpf,
+		}
 
-	// valido := funcoesCliente.VerificarRota(origem, destino)
-	// if valido {
-	// 	// Enviando mensagem ao servidor
-	// 	fmt.Fprintf(conn, "%s,%s\n", origem, destino)
-
-	// 	// Recebendo resposta do servidor
-	// 	response, _ := bufio.NewReader(conn).ReadString('\n')
-	// 	fmt.Println("Resposta do servidor:", response)
-	// }else{
-	// 	fmt.Println("Rota inválida")
-	// }
+		if user.Cpf != ""{
+			funcoesCliente.Menu(ADRESS, user)
+			cpf_valido = false
+		}else{
+			fmt.Printf("CPF não fornecido\n")
+		}
 }
+}
+

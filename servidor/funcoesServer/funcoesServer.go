@@ -33,12 +33,10 @@ func (s Request) String() string {
 }
 
 type Compra struct {
-	Nome    string   `json:"Nome"`
 	Cpf     string   `json:"Cpf"`
 	Caminho []string `json:"Caminho"`
 }
 type User struct {
-	Nome string `json:"Nome"`
 	Cpf  string `json:"Cpf"`
 }
 
@@ -78,7 +76,6 @@ func SalvarCompra(compra Compra) error {
 
 	// Decodificar o conteúdo do arquivo para uma lista de compras
 	var compras []struct {
-		Nome    string     `json:"Nome"`
 		Cpf     string     `json:"Cpf"`
 		Caminho [][]string `json:"Caminho"`
 	}
@@ -89,7 +86,6 @@ func SalvarCompra(compra Compra) error {
 
 	// Verificar se já existe uma entrada para o CPF fornecido
 	var usuarioExistente *struct {
-		Nome    string     `json:"Nome"`
 		Cpf     string     `json:"Cpf"`
 		Caminho [][]string `json:"Caminho"`
 	}
@@ -106,11 +102,9 @@ func SalvarCompra(compra Compra) error {
 	} else {
 		// Adicionar nova compra se não houver entrada para o CPF
 		compras = append(compras, struct {
-			Nome    string     `json:"Nome"`
 			Cpf     string     `json:"Cpf"`
 			Caminho [][]string `json:"Caminho"`
 		}{
-			Nome:    compra.Nome,
 			Cpf:     compra.Cpf,
 			Caminho: [][]string{compra.Caminho},
 		})
@@ -149,7 +143,6 @@ func LerCompras(cpf string) ([][]string, error) {
 
 	// Decodificar o conteúdo do arquivo para uma lista de compras
 	var compras []struct {
-		Nome    string     `json:"Nome"`
 		Cpf     string     `json:"Cpf"`
 		Caminho [][]string `json:"Caminho"`
 	}
@@ -219,12 +212,13 @@ func CadastrarUsuario(novoUsuario User) error {
 		return fmt.Errorf("erro ao decodificar JSON: %v", err)
 	}
 
-	// // Verificar se o CPF já está cadastrado
-	// for _, u := range users {
-	// 	if u.Cpf == novoUsuario.Cpf {
-	// 		return fmt.Errorf("Logando com CPF %s", novoUsuario.Cpf)
-	// 	}
-	// }
+	// Verificar se o CPF já está cadastrado
+	for _, u := range users {
+	 	if u.Cpf == novoUsuario.Cpf {
+	 		fmt.Printf("Logando com CPF %s", novoUsuario.Cpf)
+			return nil
+	 	}
+    }
 
 	// Adicionar o novo usuário à lista
 	users = append(users, novoUsuario)

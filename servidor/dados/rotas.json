@@ -2,7 +2,7 @@
   "Feira": [
     {
       "Destino": "Salvador",
-      "Vagas": 7,
+      "Vagas": 0,
       "Peso": 5
     },
     {
@@ -48,14 +48,14 @@
     },
     {
       "Destino": "Feira",
-      "Vagas": 22,
+      "Vagas": 21,
       "Peso": 5
     }
   ],
   "São Paulo": [
     {
       "Destino": "Salvador",
-      "Vagas": 20,
+      "Vagas": 19,
       "Peso": 15
     },
     {

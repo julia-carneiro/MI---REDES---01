@@ -20,13 +20,11 @@ const (
 )
 
 type Compra struct {
-	Nome    string
 	Cpf     string
 	Caminho []string
 }
 
 type User struct {
-	Nome string `json:"Nome"`
 	Cpf  string `json:"Cpf"`
 }
 
@@ -80,64 +78,66 @@ func menorCaminhoDFS(inicio, fim string) ([]string, int) {
 	return melhorCaminho, menorPeso
 }
 
-func Menu(ADRESS string) {
+func Menu(ADRESS string, user User) {
 	var operacao int
 	var conn net.Conn
+	var i = true
 
-	//Logar
-	fmt.Println("----- Faça login/cadastro-----")
+	for i {
 
-	var nome, cpf string
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Digite seu nome:")
-	nome, _ = reader.ReadString('\n')
-	nome = strings.TrimSpace(nome)
-
-	fmt.Println("Digite seu CPF:")
-	cpf, _ = reader.ReadString('\n')
-	cpf = strings.TrimSpace(cpf)
-
-	conn = ConectarServidor(ADRESS)
-	Cadastrar(conn, nome, cpf)
-	defer conn.Close()
-
-	user := User{
-		Nome: nome,
-		Cpf:  cpf,
-	}
-
-	// Lendo entrada do usuário
-	fmt.Println("O que deseja fazer?\n1- Comprar passagens\n2-Ver passagens compradas ")
-	fmt.Scanf("%d\n", &operacao)
-
-	switch operacao {
-	case 1:
 		// Lendo entrada do usuário
-		var origem, destino string
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Println("Digite a cidade de origem:")
-		origem, _ = reader.ReadString('\n')
-		origem = strings.TrimSpace(origem)
+		fmt.Println("O que deseja fazer?\n1- Comprar passagens\n2-Ver passagens compradas\n3-Sair ")
+		fmt.Scanf("%d\n", &operacao)
 
-		fmt.Println("Digite a cidade de destino:")
-		destino, _ = reader.ReadString('\n')
-		destino = strings.TrimSpace(destino)
+		switch operacao {
+		case 1:
+			// Lendo entrada do usuário
+			var origem, destino string
+			reader := bufio.NewReader(os.Stdin)
+			fmt.Println("Digite a cidade de origem:")
+			origem, _ = reader.ReadString('\n')
+			origem = strings.TrimSpace(origem)
 
-		conn = ConectarServidor(ADRESS)
-		BuscarDados(conn)
-		defer conn.Close()
+			fmt.Println("Digite a cidade de destino:")
+			destino, _ = reader.ReadString('\n')
+			destino = strings.TrimSpace(destino)
 
-		conn = ConectarServidor(ADRESS)
-		Comprar(conn, user, origem, destino)
-		defer conn.Close()
+			inicioExiste := false
+			fimExiste := false
+		
+			conn = ConectarServidor(ADRESS)
+			BuscarDados(conn)
+			defer conn.Close()
+			// Verifica se a cidade inicial existe no mapa de rotas
+			if _, existe := rotas[origem]; existe {
+				inicioExiste = true
+			}
+		
+			// Verifica se a cidade final existe no mapa de rotas
+			if _, existe := rotas[destino]; existe {
+				fimExiste = true
+			}
+			// Caso qualquer uma das cidades não exista, não é necessário continuar
+			if inicioExiste && fimExiste {
 
-	case 2:
-		conn = ConectarServidor(ADRESS)
-		VerPassagensCompradas(conn, user.Cpf)
-		defer conn.Close()
-	default:
-		fmt.Println("Operação inválida.")
+				conn = ConectarServidor(ADRESS)
+				Comprar(conn, user, origem, destino)
+				defer conn.Close()
+			}else{
+				fmt.Println("Não existe rota")
+			}
 
+		case 2:
+			conn = ConectarServidor(ADRESS)
+			VerPassagensCompradas(conn, user.Cpf)
+			defer conn.Close()
+		case 3:
+			i = false
+			break
+		default:
+			fmt.Println("Operação inválida.")
+
+		}
 	}
 
 }
@@ -241,9 +241,8 @@ func SolicitarDados(conn net.Conn) {
 // 	return false
 // }
 
-func Cadastrar(conn net.Conn, nome string, cpf string) {
+func Cadastrar(conn net.Conn, cpf string) {
 	user := User{
-		Nome: nome,
 		Cpf:  cpf,
 	}
 	dados := Dados{
@@ -260,18 +259,18 @@ func Cadastrar(conn net.Conn, nome string, cpf string) {
 	}
 
 	// // Enviar o JSON ao servidor
-	fmt.Println("Enviando dados:", string(jsonData)) // Exibe o JSON como string
+	// fmt.Println("Enviando dados:", string(jsonData)) // Exibe o JSON como string
 	conn.Write(jsonData)
 	conn.Write([]byte("\n")) // Enviar uma nova linha para indicar o fim da mensagem
 
 	// Ler a resposta do servidor
-	buffer := make([]byte, 1024)
-	n, err := conn.Read(buffer)
-	if err != nil {
-		fmt.Println("Erro ao ler a resposta do servidor:", err)
-		return
-	}
-	fmt.Println("Resposta do servidor:", string(buffer[:n]))
+	// buffer := make([]byte, 1024)
+	// _, err := conn.Read(buffer)
+	// if err != nil {
+	// 	fmt.Println("Erro ao ler a resposta do servidor:", err)
+	// 	return
+	// }
+	// fmt.Println("Resposta do servidor:", string(buffer[:n]))
 }
 
 func Comprar(conn net.Conn, user User, origem string, destino string) {
@@ -281,7 +280,6 @@ func Comprar(conn net.Conn, user User, origem string, destino string) {
 		fmt.Printf("Rota encontrada - %s a %s: %v", origem, destino, caminho)
 
 		compra := Compra{
-			Nome:    user.Nome,
 			Cpf:     user.Cpf,
 			Caminho: caminho,
 		}
@@ -342,7 +340,7 @@ func VerPassagensCompradas(conn net.Conn, cpf string) {
 	}
 
 	// Enviar o JSON ao servidor
-	fmt.Println("Enviando dados:", string(jsonData)) // Exibe o JSON como string
+	// fmt.Println("Enviando dados:", string(jsonData)) // Exibe o JSON como string
 	conn.Write(jsonData)
 	conn.Write([]byte("\n")) // Enviar uma nova linha para indicar o fim da mensagem
 
@@ -353,6 +351,13 @@ func VerPassagensCompradas(conn net.Conn, cpf string) {
 		fmt.Println("Erro ao ler a resposta do servidor:", err)
 		return
 	}
-	fmt.Println("Passagens Compradas:")
-	fmt.Println(string(buffer[:n]))
+
+	response := string(buffer[:n])
+	// Verificar se a resposta indica que há passagens compradas
+	if response != "null" {
+		fmt.Println("Passagens Compradas:")
+		fmt.Println(response)
+	} else {
+		fmt.Println("Nenhuma passagem comprada")
+	}
 }

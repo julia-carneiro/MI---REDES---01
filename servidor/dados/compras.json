@@ -1,21 +1,7 @@
 [
   {
-    "Nome": "Júlia",
-    "Cpf": "093.234.234-23",
-    "Caminho": [
-      [
-        "São Paulo",
-        "Recife"
-      ],
-      [
-        "São Paulo",
-        "Salvador"
-      ]
-    ]
-  },
-  {
-    "Nome": "Julia",
-    "Cpf": "09320",
+    "Nome": "thiago",
+    "Cpf": "0123",
     "Caminho": [
       [
         "Feira",
@@ -24,27 +10,8 @@
     ]
   },
   {
-    "Nome": "teste",
-    "Cpf": "23",
-    "Caminho": [
-      [
-        "Feira",
-        "Salvador",
-        "São Paulo"
-      ],
-      [
-        "Salvador",
-        "São Paulo"
-      ],
-      [
-        "Salvador",
-        "São Paulo"
-      ]
-    ]
-  },
-  {
-    "Nome": "juliaaaa",
-    "Cpf": "2",
+    "Nome": "julia c",
+    "Cpf": "698",
     "Caminho": [
       [
         "Feira",
