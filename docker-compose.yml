@@ -22,15 +22,14 @@ services:
       - servidor
     image: p1-cliente-venda-de-passagens
     container_name: cliente-container
-    networks:
-      - app-network
-    volumes:
-      - .:/app
+  
     stdin_open: true    
     tty: true           
     command: go run client.go
     environment:
       - ADRESS=servidor:22355
+    networks:
+      - app-network
 
 networks:
   app-network:
