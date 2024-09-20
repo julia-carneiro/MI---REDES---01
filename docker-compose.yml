@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  servidor:
+    build:
+      context: .
+      dockerfile: dockerfile.servidor
+    ports:
+      - "22355:22355"
+    image: p1-servidor-venda-de-passagens
+    container_name: servidor-container
+    stdin_open: true    #terminal interativo
+    tty: true           #terminal para o container
+    command: go run servidor.go
+    networks:
+      - app-network
+
+  cliente:
+    build:
+      context: .
+      dockerfile: dockerfile.cliente
+    depends_on:
+      - servidor
+    image: p1-cliente-venda-de-passagens
+    container_name: cliente-container
+    networks:
+      - app-network
+    volumes:
+      - .:/app
+    stdin_open: true    
+    tty: true           
+    command: go run client.go
+    environment:
+      - ADRESS=servidor:22355
+
+networks:
+  app-network:
+    driver: bridge
