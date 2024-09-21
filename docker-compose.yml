@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   servidor:
     build:
@@ -22,12 +21,10 @@ services:
       - servidor
     image: p1-cliente-venda-de-passagens
     container_name: cliente-container
-  
     stdin_open: true    
     tty: true           
-    command: go run client.go
     environment:
-      - ADRESS=servidor:22355
+      - SERVER_ADDRESS=servidor:22355
     networks:
       - app-network
 

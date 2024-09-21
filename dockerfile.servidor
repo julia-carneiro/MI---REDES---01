@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY go.mod . 
 
-COPY /servidor /app/servidor
+COPY ./servidor /app/servidor
 
 RUN go build -o bin-servidor ./servidor
 

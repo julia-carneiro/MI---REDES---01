@@ -1,11 +1,28 @@
-FROM golang:1.23
+# Etapa 1: Fase de build com Go
+FROM golang:1.23-alpine AS build
 
+# Definir diretório de trabalho
 WORKDIR /app
 
+# Copiar go.mod e baixar as dependências
 COPY go.mod . 
+RUN go mod download
 
-COPY /cliente /app/cliente
+# Copiar o código-fonte do cliente
+COPY ./cliente /app/cliente
 
-RUN go build -o bin-cliente ./cliente
+# Compilar o binário do cliente
+RUN go build -o /app/bin-cliente ./cliente/cliente.go
 
+# Etapa final: usar a mesma imagem base (ou versão compatível)
+FROM golang:1.23-alpine
+WORKDIR /app
+
+# Copiar o binário compilado da fase anterior
+COPY --from=build /app/bin-cliente /app/bin-cliente
+
+# Garantir que o binário seja executável
+RUN chmod +x /app/bin-cliente
+
+# Comando para rodar o binário
 CMD ["/app/bin-cliente"]
