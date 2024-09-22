@@ -1,6 +1,5 @@
 [
   {
-    "Nome": "thiago",
     "Cpf": "0123",
     "Caminho": [
       [
@@ -10,12 +9,32 @@
     ]
   },
   {
-    "Nome": "julia c",
     "Cpf": "698",
     "Caminho": [
       [
         "Feira",
         "Salvador"
+      ]
+    ]
+  },
+  {
+    "Cpf": "45",
+    "Caminho": [
+      [
+        "São Paulo",
+        "Feira"
+      ],
+      [
+        "Recife",
+        "Salvador"
+      ],
+      [
+        "Recife",
+        "Salvador"
+      ],
+      [
+        "São Paulo",
+        "Feira"
       ]
     ]
   }

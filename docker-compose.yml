@@ -7,6 +7,8 @@ services:
       - "22356:22356"
     image: p1-servidor-venda-de-passagens
     container_name: servidor-container
+    volumes:
+      - ./servidor/dados:/app/dados
     networks:
       - app-network
 

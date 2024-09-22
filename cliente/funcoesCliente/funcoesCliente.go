@@ -44,6 +44,25 @@ type Rota struct {
 // Estrutura de dados para o grafo das rotas.
 var rotas map[string][]Rota
 
+func VerificarVagas(caminho []string) bool{
+	CompraValida := false
+	for i := 0; i < len(caminho); i++ { //percorre as cidades da rota
+		if i+1 != len(caminho) { // verifica se a cidade atual não é o destino final
+			for j := 0; j < len(rotas[caminho[i]]); j++ { // percorre as cidades que a cidade atual faz rota
+				if rotas[caminho[i]][j].Destino == caminho[i+1] { // verifica a rota é a rota desejada
+					if rotas[caminho[i]][j].Vagas > 0 { // caso seja a rota desejada verifica se há vagas
+						CompraValida = true
+					} else {
+						CompraValida = false
+					}
+				}
+			}
+		}
+	}
+	return CompraValida
+
+}
+
 // Função para realizar a busca em profundidade para encontrar o caminho com o menor peso total.
 func buscaProfundidade(cidadeAtual, destino string, visitado map[string]bool, caminhoAtual []string, pesoAtual, menorPeso *int, melhorCaminho *[]string) {
 	if cidadeAtual == destino {
@@ -108,6 +127,7 @@ func Menu(ADRESS string, user User) {
 			conn = ConectarServidor(ADRESS)
 			BuscarDados(conn)
 			defer conn.Close()
+
 			// Verifica se a cidade inicial existe no mapa de rotas
 			if _, existe := rotas[origem]; existe {
 				inicioExiste = true
@@ -276,48 +296,55 @@ func Cadastrar(conn net.Conn, cpf string) {
 func Comprar(conn net.Conn, user User, origem string, destino string) {
 
 	caminho, _ := menorCaminhoDFS(origem, destino)
-	if len(caminho) > 0 {
-		fmt.Printf("Rota encontrada - %s a %s: %v", origem, destino, caminho)
+	
+	if (len(caminho) > 0 ) {
+		if(VerificarVagas(caminho)){
+			fmt.Printf("Rota encontrada - %s a %s: %v", origem, destino, caminho)
 
-		compra := Compra{
-			Cpf:     user.Cpf,
-			Caminho: caminho,
-		}
-
-		dados := Dados{
-			Request:      COMPRA,
-			DadosCompra:  &compra,
-			DadosUsuario: nil,
-		}
-
-		var resposta int
-		fmt.Print("Deseja realizar a compra?\n1- Sim\n2- Não\n")
-		fmt.Scanf("%d\n", &resposta)
-		if resposta == 1 {
-			//Converter dados para JSON
-			jsonData, err := json.Marshal(dados)
-			if err != nil {
-				fmt.Println("Erro ao converter para JSON:", err)
-				return
+			compra := Compra{
+				Cpf:     user.Cpf,
+				Caminho: caminho,
 			}
 
-			// // Enviar o JSON ao servidor
-			fmt.Println("Enviando dados:", string(jsonData)) // Exibe o JSON como string
-			conn.Write(jsonData)
-			conn.Write([]byte("\n")) // Enviar uma nova linha para indicar o fim da mensagem
-
-			// Ler a resposta do servidor
-			buffer := make([]byte, 1024)
-			n, err := conn.Read(buffer)
-			if err != nil {
-				fmt.Println("Erro ao ler a resposta do servidor:", err)
-				return
+			dados := Dados{
+				Request:      COMPRA,
+				DadosCompra:  &compra,
+				DadosUsuario: nil,
 			}
-			fmt.Println("Resposta do servidor:", string(buffer[:n]))
-		}
+
+			var resposta int
+			fmt.Print("Deseja realizar a compra?\n1- Sim\n2- Não\n")
+			fmt.Scanf("%d\n", &resposta)
+			if resposta == 1 {
+				//Converter dados para JSON
+				jsonData, err := json.Marshal(dados)
+				if err != nil {
+					fmt.Println("Erro ao converter para JSON:", err)
+					return
+				}
+
+				// // Enviar o JSON ao servidor
+				// fmt.Println("Enviando dados:", string(jsonData)) // Exibe o JSON como string
+				conn.Write(jsonData)
+				conn.Write([]byte("\n")) // Enviar uma nova linha para indicar o fim da mensagem
+
+				// Ler a resposta do servidor
+				buffer := make([]byte, 1024)
+				n, err := conn.Read(buffer)
+				if err != nil {
+					fmt.Println("Erro ao ler a resposta do servidor:", err)
+					return
+				}
+				fmt.Println("Resposta do servidor:", string(buffer[:n]))
+			}
+		}else{
+			fmt.Println("Não há vagas para essa rota.")
+		}	
 
 	} else {
-		fmt.Printf("Rota não encontrada")
+		
+		fmt.Println("Rota não encontrada")
+		
 	}
 }
 

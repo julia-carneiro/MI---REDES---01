@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"path/filepath"
+	// "path/filepath"
 )
 
 type Request int
@@ -53,9 +53,9 @@ type Rota struct {
 }
 
 var rotas map[string][]Rota
-var filePathRotas = filepath.Join("dados", "rotas.json")
-var filePathUsers = filepath.Join("dados", "users.json")
-var filePathCompras = filepath.Join("dados", "compras.json")
+var filePathRotas = "/app/dados/rotas.json"
+var filePathUsers = "/app/dados/users.json"
+var filePathCompras = "/app/dados/compras.json"
 
 func SalvarCompra(compra Compra) error {
 	// Ler o conteúdo existente do arquivo de compras
