@@ -4,12 +4,9 @@ services:
       context: .
       dockerfile: dockerfile.servidor
     ports:
-      - "22355:22355"
+      - "22356:22356"
     image: p1-servidor-venda-de-passagens
     container_name: servidor-container
-    stdin_open: true    #terminal interativo
-    tty: true           #terminal para o container
-    command: go run servidor.go
     networks:
       - app-network
 

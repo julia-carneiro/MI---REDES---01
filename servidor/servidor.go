@@ -6,7 +6,7 @@ import (
 	"sessao3/servidor/funcoesServer"
 )
 
-var ADRESS string = "0.0.0.0:22355"
+var ADRESS string = "0.0.0.0:22356"
 
 func main() {
 	// Escutando na porta 8080

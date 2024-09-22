@@ -3,9 +3,12 @@ FROM golang:1.23
 WORKDIR /app
 
 COPY go.mod . 
-
 COPY ./servidor /app/servidor
 
-RUN go build -o bin-servidor ./servidor
+# Compila o servidor. Certifique-se de que o caminho está correto!
+RUN go build -o bin-servidor ./servidor/servidor.go 
 
-ENTRYPOINT [ "/app/bin-servidor" ]  
+EXPOSE 200
+
+# Define o comando de entrada para executar o servidor
+ENTRYPOINT [ "./bin-servidor" ]

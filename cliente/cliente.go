@@ -9,7 +9,7 @@ import (
 	"sessao3/cliente/funcoesCliente"
 )
 
-var ADRESS string = "0.0.0.0:22355"
+var ADRESS string = "servidor-container:22356"
 // type User struct {
 // 	Cpf  string `json:"Cpf"`
 // }
