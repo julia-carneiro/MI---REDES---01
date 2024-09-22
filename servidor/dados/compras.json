@@ -35,6 +35,20 @@
       [
         "São Paulo",
         "Feira"
+      ],
+      [
+        "Recife",
+        "São Paulo",
+        "Curitiba"
+      ],
+      [
+        "Feira",
+        "Brasília"
+      ],
+      [
+        "Feira",
+        "Salvador",
+        "São Paulo"
       ]
     ]
   }

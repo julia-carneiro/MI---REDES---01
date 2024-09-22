@@ -1,4 +1,38 @@
 {
+  "Brasília": [
+    {
+      "Destino": "Salvador",
+      "Vagas": 12,
+      "Peso": 20
+    },
+    {
+      "Destino": "Recife",
+      "Vagas": 14,
+      "Peso": 22
+    },
+    {
+      "Destino": "São Paulo",
+      "Vagas": 16,
+      "Peso": 30
+    },
+    {
+      "Destino": "Manaus",
+      "Vagas": 9,
+      "Peso": 42
+    }
+  ],
+  "Curitiba": [
+    {
+      "Destino": "São Paulo",
+      "Vagas": 18,
+      "Peso": 12
+    },
+    {
+      "Destino": "Salvador",
+      "Vagas": 13,
+      "Peso": 32
+    }
+  ],
   "Feira": [
     {
       "Destino": "Salvador",
@@ -9,6 +43,11 @@
       "Destino": "Recife",
       "Vagas": 5,
       "Peso": 10
+    },
+    {
+      "Destino": "Brasília",
+      "Vagas": 0,
+      "Peso": 18
     }
   ],
   "Manaus": [
@@ -21,6 +60,11 @@
       "Destino": "Recife",
       "Vagas": 10,
       "Peso": 40
+    },
+    {
+      "Destino": "Feira",
+      "Vagas": 8,
+      "Peso": 35
     }
   ],
   "Recife": [
@@ -31,14 +75,24 @@
     },
     {
       "Destino": "Salvador",
-      "Vagas": 21,
+      "Vagas": 19,
       "Peso": 25
+    },
+    {
+      "Destino": "Manaus",
+      "Vagas": 9,
+      "Peso": 40
+    },
+    {
+      "Destino": "Brasília",
+      "Vagas": 12,
+      "Peso": 28
     }
   ],
   "Salvador": [
     {
       "Destino": "São Paulo",
-      "Vagas": 17,
+      "Vagas": 16,
       "Peso": 10
     },
     {
@@ -50,6 +104,11 @@
       "Destino": "Feira",
       "Vagas": 21,
       "Peso": 5
+    },
+    {
+      "Destino": "Brasília",
+      "Vagas": 15,
+      "Peso": 22
     }
   ],
   "São Paulo": [
@@ -65,8 +124,13 @@
     },
     {
       "Destino": "Feira",
-      "Vagas": 20,
+      "Vagas": 19,
       "Peso": 15
+    },
+    {
+      "Destino": "Curitiba",
+      "Vagas": 25,
+      "Peso": 12
     }
   ]
 }

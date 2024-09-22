@@ -192,7 +192,7 @@ func BuscarDados(conn net.Conn) {
 	conn.Write([]byte("\n")) // Enviar uma nova linha para indicar o fim da mensagem
 
 	// Ler a resposta do servidor
-	buffer := make([]byte, 1024)
+	buffer := make([]byte, 4096)
 	n, err := conn.Read(buffer)
 	if err != nil {
 		fmt.Println("Erro ao ler a resposta do servidor:", err)
