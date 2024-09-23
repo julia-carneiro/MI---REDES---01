@@ -1,4 +1,9 @@
 # Sistema de Compra de Passagens Aéreas
+> Grupo:
+> - Júlia Carneiro Gonçalves de Souza.
+> - Thiago Souza Rodrigues.
+
+
 Descrição do problema disponível em: [TEC502 - Problema 1 - Venda de Passagens.pdf](https://github.com/user-attachments/files/16853459/TEC502.-.Problema.1.-.Venda.de.Passagens.-.Versao.2.pdf)
 
 ## Introdução
