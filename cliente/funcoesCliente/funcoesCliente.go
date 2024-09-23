@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+
 	// "math"
 	"net"
 	"os"
@@ -26,7 +27,7 @@ type Compra struct {
 }
 
 type User struct {
-	Cpf  string `json:"Cpf"`
+	Cpf string `json:"Cpf"`
 }
 
 type Dados struct {
@@ -45,7 +46,7 @@ type Rota struct {
 // Estrutura de dados para o grafo das rotas.
 var rotas map[string][]Rota
 
-func VerificarVagas(caminho []string) bool{
+func VerificarVagas(caminho []string) bool {
 	CompraValida := false
 	for i := 0; i < len(caminho); i++ { //percorre as cidades da rota
 		if i+1 != len(caminho) { // verifica se a cidade atual não é o destino final
@@ -53,12 +54,12 @@ func VerificarVagas(caminho []string) bool{
 				if rotas[caminho[i]][j].Destino == caminho[i+1] { // verifica a rota é a rota desejada
 					if rotas[caminho[i]][j].Vagas > 0 {
 						fmt.Print(caminho[i])
-						fmt.Print("\n",rotas[caminho[i]][j].Destino)
-						fmt.Print("\n",rotas[caminho[i]][j].Vagas) // caso seja a rota desejada verifica se há vagas
+						fmt.Print("\n", rotas[caminho[i]][j].Destino)
+						fmt.Print("\n", rotas[caminho[i]][j].Vagas) // caso seja a rota desejada verifica se há vagas
 						CompraValida = true
 					} else {
-						 CompraValida = false
-						 return CompraValida
+						CompraValida = false
+						return CompraValida
 					}
 				}
 			}
@@ -69,54 +70,53 @@ func VerificarVagas(caminho []string) bool{
 }
 
 type Caminho struct {
-    Cidades []string
-    Peso    int
+	Cidades []string
+	Peso    int
 }
 
 // Função modificada para buscar todos os caminhos
-func BuscarTodosCaminhos(origem, destino string, ) []Caminho {
-    var caminhos []Caminho
-    var caminhoAtual []string
-    caminhoAtual = append(caminhoAtual, origem)
+func BuscarTodosCaminhos(origem, destino string) []Caminho {
+	var caminhos []Caminho
+	var caminhoAtual []string
+	caminhoAtual = append(caminhoAtual, origem)
 
-    visitarCidades(origem, destino, caminhoAtual, 0, &caminhos)
+	visitarCidades(origem, destino, caminhoAtual, 0, &caminhos)
 
-    // Ordena a lista de caminhos pelo peso total (menor caminho primeiro)
-    sort.Slice(caminhos, func(i, j int) bool {
-        return caminhos[i].Peso < caminhos[j].Peso
-    })
+	// Ordena a lista de caminhos pelo peso total (menor caminho primeiro)
+	sort.Slice(caminhos, func(i, j int) bool {
+		return caminhos[i].Peso < caminhos[j].Peso
+	})
 
-    return caminhos
+	return caminhos
 }
 
 // Função recursiva para visitar cidades e encontrar todos os caminhos
 func visitarCidades(origem, destino string, caminhoAtual []string, pesoAtual int, caminhos *[]Caminho) {
-    if origem == destino {
-        // Adiciona o caminho encontrado à lista de caminhos
-        novoCaminho := make([]string, len(caminhoAtual))
-        copy(novoCaminho, caminhoAtual)
-        *caminhos = append(*caminhos, Caminho{Cidades: novoCaminho, Peso: pesoAtual})
-        return
-    }
+	if origem == destino {
+		// Adiciona o caminho encontrado à lista de caminhos
+		novoCaminho := make([]string, len(caminhoAtual))
+		copy(novoCaminho, caminhoAtual)
+		*caminhos = append(*caminhos, Caminho{Cidades: novoCaminho, Peso: pesoAtual})
+		return
+	}
 
-    for _, rota := range rotas[origem] {
-        if !contem(caminhoAtual, rota.Destino) { // evita ciclos
-            // Continua a busca a partir do próximo destino
-            visitarCidades(rota.Destino, destino, append(caminhoAtual, rota.Destino), pesoAtual+rota.Peso, caminhos)
-        }
-    }
+	for _, rota := range rotas[origem] {
+		if !contem(caminhoAtual, rota.Destino) { // evita ciclos
+			// Continua a busca a partir do próximo destino
+			visitarCidades(rota.Destino, destino, append(caminhoAtual, rota.Destino), pesoAtual+rota.Peso, caminhos)
+		}
+	}
 }
 
 // Função auxiliar para verificar se uma cidade já está no caminho atual (para evitar ciclos)
 func contem(caminho []string, cidade string) bool {
-    for _, c := range caminho {
-        if c == cidade {
-            return true
-        }
-    }
-    return false
+	for _, c := range caminho {
+		if c == cidade {
+			return true
+		}
+	}
+	return false
 }
-
 
 func Menu(ADRESS string, user User) {
 	var operacao int
@@ -144,7 +144,7 @@ func Menu(ADRESS string, user User) {
 
 			inicioExiste := false
 			fimExiste := false
-		
+
 			conn = ConectarServidor(ADRESS)
 			BuscarDados(conn)
 			defer conn.Close()
@@ -153,7 +153,7 @@ func Menu(ADRESS string, user User) {
 			if _, existe := rotas[origem]; existe {
 				inicioExiste = true
 			}
-		
+
 			// Verifica se a cidade final existe no mapa de rotas
 			if _, existe := rotas[destino]; existe {
 				fimExiste = true
@@ -164,7 +164,7 @@ func Menu(ADRESS string, user User) {
 				conn = ConectarServidor(ADRESS)
 				Comprar(conn, user, origem, destino)
 				defer conn.Close()
-			}else{
+			} else {
 				fmt.Println("Não existe rota")
 			}
 
@@ -284,7 +284,7 @@ func SolicitarDados(conn net.Conn) {
 
 func Cadastrar(conn net.Conn, cpf string) {
 	user := User{
-		Cpf:  cpf,
+		Cpf: cpf,
 	}
 	dados := Dados{
 		Request:      CADASTRO,
@@ -317,21 +317,19 @@ func Cadastrar(conn net.Conn, cpf string) {
 func Comprar(conn net.Conn, user User, origem string, destino string) {
 	var caminho_final []string
 	var caminhos []Caminho = BuscarTodosCaminhos(origem, destino)
-	fmt.Print(caminhos)
 	var vagas = false
-	
+
 	for i := 0; i < len(caminhos); i++ {
 		vagas = VerificarVagas(caminhos[i].Cidades)
-		if vagas{
+		if vagas {
 			caminho_final = caminhos[i].Cidades
-			
+
 			break
 		}
 	}
-		
-	
-	if (len(caminho_final) > 0 ) {
-		if(vagas){
+
+	if len(caminho_final) > 0 {
+		if vagas {
 			fmt.Printf("Rota encontrada - %s a %s: %v", origem, destino, caminho_final)
 
 			compra := Compra{
@@ -370,14 +368,14 @@ func Comprar(conn net.Conn, user User, origem string, destino string) {
 				}
 				fmt.Println("Resposta do servidor:", string(buffer[:n]))
 			}
-		}else{
+		} else {
 			fmt.Println("Não há vagas para essa rota.")
-		}	
+		}
 
 	} else {
-		
+
 		fmt.Println("Rota não encontrada")
-		
+
 	}
 }
 

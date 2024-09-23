@@ -36,17 +36,17 @@
   "Feira": [
     {
       "Destino": "Salvador",
-      "Vagas": 0,
+      "Vagas": 3,
       "Peso": 5
     },
     {
       "Destino": "Recife",
-      "Vagas": 0,
+      "Vagas": 5,
       "Peso": 10
     },
     {
       "Destino": "Brasília",
-      "Vagas": 0,
+      "Vagas": 5,
       "Peso": 18
     }
   ],
