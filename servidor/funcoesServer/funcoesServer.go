@@ -6,7 +6,13 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"sync"
 	// "path/filepath"
+)
+
+var (
+	vagas int
+	mu    sync.Mutex
 )
 
 type Request int
@@ -278,6 +284,8 @@ func AtualizarVagas(info Compra) {
 // Verifica se há vagas nas rotas que o usuário deseja comprar
 // Depois é necessario subtrair o número de vagas
 func ValidarCompra(info Compra) bool {
+	mu.Lock() // Bloqueia o mutex
+	defer mu.Unlock() // Garante que o mutex será desbloqueado ao final da função
 	rotas = BuscarArquivosRotas()
 	CompraValida := false
 	for i := 0; i < len(info.Caminho); i++ { //percorre as cidades da rota
@@ -286,13 +294,17 @@ func ValidarCompra(info Compra) bool {
 				if rotas[info.Caminho[i]][j].Destino == info.Caminho[i+1] { // verifica a rota é a rota desejada
 					if rotas[info.Caminho[i]][j].Vagas > 0 { // caso seja a rota desejada verifica se há vagas
 						CompraValida = true
-					} else {
-						CompraValida = false
+						} else {
+							CompraValida = false
+							return CompraValida
+						}
 					}
 				}
 			}
 		}
-	}
+		if CompraValida{
+			AtualizarVagas(info)
+		}
 	return CompraValida
 
 }
@@ -348,9 +360,6 @@ func HandleConnection(conn net.Conn) {
 		aprovado := ValidarCompra(*dados.DadosCompra)
 		var result string
 		if aprovado {
-			//Subtrair o numero de vagas nas rotas
-			AtualizarVagas(*dados.DadosCompra)
-
 			// Salvar a compra no arquivo "compras.json"
 			err := SalvarCompra(*dados.DadosCompra)
 			if err != nil {

@@ -22,8 +22,7 @@ services:
     container_name: cliente-container
     stdin_open: true    
     tty: true           
-    environment:
-      - SERVER_ADDRESS=servidor:22355
+
     networks:
       - app-network
 

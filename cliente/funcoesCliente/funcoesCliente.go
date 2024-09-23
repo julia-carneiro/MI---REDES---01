@@ -4,9 +4,10 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"math"
+	// "math"
 	"net"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -50,10 +51,14 @@ func VerificarVagas(caminho []string) bool{
 		if i+1 != len(caminho) { // verifica se a cidade atual não é o destino final
 			for j := 0; j < len(rotas[caminho[i]]); j++ { // percorre as cidades que a cidade atual faz rota
 				if rotas[caminho[i]][j].Destino == caminho[i+1] { // verifica a rota é a rota desejada
-					if rotas[caminho[i]][j].Vagas > 0 { // caso seja a rota desejada verifica se há vagas
+					if rotas[caminho[i]][j].Vagas > 0 {
+						fmt.Print(caminho[i])
+						fmt.Print("\n",rotas[caminho[i]][j].Destino)
+						fmt.Print("\n",rotas[caminho[i]][j].Vagas) // caso seja a rota desejada verifica se há vagas
 						CompraValida = true
 					} else {
-						CompraValida = false
+						 CompraValida = false
+						 return CompraValida
 					}
 				}
 			}
@@ -63,39 +68,55 @@ func VerificarVagas(caminho []string) bool{
 
 }
 
-// Função para realizar a busca em profundidade para encontrar o caminho com o menor peso total.
-func buscaProfundidade(cidadeAtual, destino string, visitado map[string]bool, caminhoAtual []string, pesoAtual, menorPeso *int, melhorCaminho *[]string) {
-	if cidadeAtual == destino {
-		if pesoAtual != nil && menorPeso != nil && *pesoAtual < *menorPeso {
-			*menorPeso = *pesoAtual
-			*melhorCaminho = append([]string(nil), caminhoAtual...) // Copia o caminho atual para o melhor caminho
-		}
-		return
-	}
-
-	visitado[cidadeAtual] = true
-	for _, rota := range rotas[cidadeAtual] {
-		if !visitado[rota.Destino] {
-			caminhoAtual = append(caminhoAtual, rota.Destino)
-			*pesoAtual += rota.Peso
-			buscaProfundidade(rota.Destino, destino, visitado, caminhoAtual, pesoAtual, menorPeso, melhorCaminho)
-			*pesoAtual -= rota.Peso
-			caminhoAtual = caminhoAtual[:len(caminhoAtual)-1]
-		}
-	}
-	visitado[cidadeAtual] = false
+type Caminho struct {
+    Cidades []string
+    Peso    int
 }
 
-func menorCaminhoDFS(inicio, fim string) ([]string, int) {
-	visitado := make(map[string]bool)
-	caminhoAtual := []string{inicio}
-	var melhorCaminho []string
-	var pesoAtual, menorPeso int
-	menorPeso = math.MaxInt32
+// Função modificada para buscar todos os caminhos
+func BuscarTodosCaminhos(origem, destino string, ) []Caminho {
+    var caminhos []Caminho
+    var caminhoAtual []string
+    caminhoAtual = append(caminhoAtual, origem)
 
-	buscaProfundidade(inicio, fim, visitado, caminhoAtual, &pesoAtual, &menorPeso, &melhorCaminho)
-	return melhorCaminho, menorPeso
+    visitarCidades(origem, destino, caminhoAtual, 0, &caminhos)
+
+    // Ordena a lista de caminhos pelo peso total (menor caminho primeiro)
+    sort.Slice(caminhos, func(i, j int) bool {
+        return caminhos[i].Peso < caminhos[j].Peso
+    })
+
+    return caminhos
 }
+
+// Função recursiva para visitar cidades e encontrar todos os caminhos
+func visitarCidades(origem, destino string, caminhoAtual []string, pesoAtual int, caminhos *[]Caminho) {
+    if origem == destino {
+        // Adiciona o caminho encontrado à lista de caminhos
+        novoCaminho := make([]string, len(caminhoAtual))
+        copy(novoCaminho, caminhoAtual)
+        *caminhos = append(*caminhos, Caminho{Cidades: novoCaminho, Peso: pesoAtual})
+        return
+    }
+
+    for _, rota := range rotas[origem] {
+        if !contem(caminhoAtual, rota.Destino) { // evita ciclos
+            // Continua a busca a partir do próximo destino
+            visitarCidades(rota.Destino, destino, append(caminhoAtual, rota.Destino), pesoAtual+rota.Peso, caminhos)
+        }
+    }
+}
+
+// Função auxiliar para verificar se uma cidade já está no caminho atual (para evitar ciclos)
+func contem(caminho []string, cidade string) bool {
+    for _, c := range caminho {
+        if c == cidade {
+            return true
+        }
+    }
+    return false
+}
+
 
 func Menu(ADRESS string, user User) {
 	var operacao int
@@ -294,16 +315,28 @@ func Cadastrar(conn net.Conn, cpf string) {
 }
 
 func Comprar(conn net.Conn, user User, origem string, destino string) {
-
-	caminho, _ := menorCaminhoDFS(origem, destino)
+	var caminho_final []string
+	var caminhos []Caminho = BuscarTodosCaminhos(origem, destino)
+	fmt.Print(caminhos)
+	var vagas = false
 	
-	if (len(caminho) > 0 ) {
-		if(VerificarVagas(caminho)){
-			fmt.Printf("Rota encontrada - %s a %s: %v", origem, destino, caminho)
+	for i := 0; i < len(caminhos); i++ {
+		vagas = VerificarVagas(caminhos[i].Cidades)
+		if vagas{
+			caminho_final = caminhos[i].Cidades
+			
+			break
+		}
+	}
+		
+	
+	if (len(caminho_final) > 0 ) {
+		if(vagas){
+			fmt.Printf("Rota encontrada - %s a %s: %v", origem, destino, caminho_final)
 
 			compra := Compra{
 				Cpf:     user.Cpf,
-				Caminho: caminho,
+				Caminho: caminho_final,
 			}
 
 			dados := Dados{
