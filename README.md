@@ -17,7 +17,7 @@ A metodologia abordada foi a partir da construção de fluxogramas e diagramas d
 
 ### Arquitetura do Projeto
 
-A arquitetura está dividida em dois principais componentes: o servidor e o cliente.Ambos estão encapsulados em um container Docker e se comunicam através de uma rede interna.
+A arquitetura está dividida em dois principais componentes: o servidor e o cliente. Foram criados dois containers Docker para armazenar cada um separadamente, mas são executados de maneira sumultânea por conta do docker compose e se comunicam através de uma rede interna.
 
 #### Servidor
 O servidor é responsável por gerenciar as seguintes funcionalidades:
