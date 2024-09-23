@@ -1,0 +1,136 @@
+{
+  "Brasília": [
+    {
+      "Destino": "Salvador",
+      "Vagas": 12,
+      "Peso": 20
+    },
+    {
+      "Destino": "Recife",
+      "Vagas": 14,
+      "Peso": 22
+    },
+    {
+      "Destino": "São Paulo",
+      "Vagas": 16,
+      "Peso": 30
+    },
+    {
+      "Destino": "Manaus",
+      "Vagas": 9,
+      "Peso": 42
+    }
+  ],
+  "Curitiba": [
+    {
+      "Destino": "São Paulo",
+      "Vagas": 18,
+      "Peso": 12
+    },
+    {
+      "Destino": "Salvador",
+      "Vagas": 13,
+      "Peso": 32
+    }
+  ],
+  "Feira": [
+    {
+      "Destino": "Salvador",
+      "Vagas": 0,
+      "Peso": 5
+    },
+    {
+      "Destino": "Recife",
+      "Vagas": 0,
+      "Peso": 10
+    },
+    {
+      "Destino": "Brasília",
+      "Vagas": 0,
+      "Peso": 18
+    }
+  ],
+  "Manaus": [
+    {
+      "Destino": "São Paulo",
+      "Vagas": 10,
+      "Peso": 30
+    },
+    {
+      "Destino": "Recife",
+      "Vagas": 10,
+      "Peso": 40
+    },
+    {
+      "Destino": "Feira",
+      "Vagas": 8,
+      "Peso": 35
+    }
+  ],
+  "Recife": [
+    {
+      "Destino": "São Paulo",
+      "Vagas": 10,
+      "Peso": 20
+    },
+    {
+      "Destino": "Salvador",
+      "Vagas": 19,
+      "Peso": 25
+    },
+    {
+      "Destino": "Manaus",
+      "Vagas": 9,
+      "Peso": 40
+    },
+    {
+      "Destino": "Brasília",
+      "Vagas": 12,
+      "Peso": 28
+    }
+  ],
+  "Salvador": [
+    {
+      "Destino": "São Paulo",
+      "Vagas": 12,
+      "Peso": 10
+    },
+    {
+      "Destino": "Recife",
+      "Vagas": 22,
+      "Peso": 25
+    },
+    {
+      "Destino": "Feira",
+      "Vagas": 21,
+      "Peso": 5
+    },
+    {
+      "Destino": "Brasília",
+      "Vagas": 15,
+      "Peso": 22
+    }
+  ],
+  "São Paulo": [
+    {
+      "Destino": "Salvador",
+      "Vagas": 19,
+      "Peso": 15
+    },
+    {
+      "Destino": "Recife",
+      "Vagas": 20,
+      "Peso": 20
+    },
+    {
+      "Destino": "Feira",
+      "Vagas": 19,
+      "Peso": 15
+    },
+    {
+      "Destino": "Curitiba",
+      "Vagas": 25,
+      "Peso": 12
+    }
+  ]
+}

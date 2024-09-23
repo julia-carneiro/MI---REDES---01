@@ -1,0 +1,31 @@
+services:
+  servidor:
+    build:
+      context: .
+      dockerfile: dockerfile.servidor
+    ports:
+      - "22356:22356"
+    image: p1-servidor-venda-de-passagens
+    container_name: servidor-container
+    volumes:
+      - ./servidor/dados:/app/dados
+    networks:
+      - app-network
+
+  cliente:
+    build:
+      context: .
+      dockerfile: dockerfile.cliente
+    depends_on:
+      - servidor
+    image: p1-cliente-venda-de-passagens
+    container_name: cliente-container
+    stdin_open: true    
+    tty: true           
+
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

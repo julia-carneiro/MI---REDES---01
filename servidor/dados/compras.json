@@ -1,0 +1,75 @@
+[
+  {
+    "Cpf": "0123",
+    "Caminho": [
+      [
+        "Feira",
+        "Salvador"
+      ]
+    ]
+  },
+  {
+    "Cpf": "698",
+    "Caminho": [
+      [
+        "Feira",
+        "Salvador"
+      ]
+    ]
+  },
+  {
+    "Cpf": "45",
+    "Caminho": [
+      [
+        "São Paulo",
+        "Feira"
+      ],
+      [
+        "Recife",
+        "Salvador"
+      ],
+      [
+        "Recife",
+        "Salvador"
+      ],
+      [
+        "São Paulo",
+        "Feira"
+      ],
+      [
+        "Recife",
+        "São Paulo",
+        "Curitiba"
+      ],
+      [
+        "Feira",
+        "Brasília"
+      ],
+      [
+        "Feira",
+        "Salvador",
+        "São Paulo"
+      ],
+      [
+        "Feira",
+        "Salvador",
+        "São Paulo"
+      ],
+      [
+        "Feira",
+        "Salvador",
+        "São Paulo"
+      ],
+      [
+        "Feira",
+        "Salvador",
+        "São Paulo"
+      ],
+      [
+        "Feira",
+        "Recife",
+        "São Paulo"
+      ]
+    ]
+  }
+]
