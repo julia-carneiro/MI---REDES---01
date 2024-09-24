@@ -71,5 +71,15 @@
         "São Paulo"
       ]
     ]
+  },
+  {
+    "Cpf": "12345678900",
+    "Caminho": [
+      [
+        "Feira",
+        "Salvador",
+        "São Paulo"
+      ]
+    ]
   }
 ]

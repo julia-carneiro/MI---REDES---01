@@ -17,52 +17,41 @@ var (
 
 type Request int
 
-const (
+const (//Tipos de mensagens que podem ser enviadas ao servidor
 	ROTAS Request = iota
 	COMPRA
 	CADASTRO
 	LERCOMPRAS
 )
 
-func (s Request) String() string {
-	switch s {
-	case ROTAS:
-		return "ROTAS"
-	case COMPRA:
-		return "COMPRA"
-	case CADASTRO:
-		return "CADASTRO"
-	case LERCOMPRAS:
-		return "LERCOMPRAS"
-	}
-	return "DESCONHECIDO"
-}
 
-type Compra struct {
+
+type Compra struct {//Estrura de dados de compra
 	Cpf     string   `json:"Cpf"`
 	Caminho []string `json:"Caminho"`
 }
-type User struct {
+type User struct {//Estrutura de dados do cliente
 	Cpf  string `json:"Cpf"`
 }
 
-type Dados struct {
+type Dados struct {//Estrutura de dados da mensagem recebida no cliente
 	Request      Request `json:"Request"`
 	DadosCompra  *Compra `json:"DadosCompra"`
 	DadosUsuario *User   `json:"DadosUsuario"`
 }
 
-type Rota struct {
+type Rota struct {//Estrura de dados de uma rota
 	Destino string `json:"Destino"`
 	Vagas   int    `json:"Vagas"`
 	Peso    int    `json:"Peso"`
 }
 
-var rotas map[string][]Rota
-var filePathRotas = "/app/dados/rotas.json"
-var filePathUsers = "/app/dados/users.json"
-var filePathCompras = "/app/dados/compras.json"
+var rotas map[string][]Rota //Dicionário de rotas
+var filePathRotas = "/app/dados/rotas.json"//caminho para arquivo de rotas
+var filePathUsers = "/app/dados/users.json"//Caminho para arquivo de dados dos usuários
+var filePathCompras = "/app/dados/compras.json"//Caminho para arquivo de compras feitas
 
+//Salva compra no arquivo de compras
 func SalvarCompra(compra Compra) error {
 	// Ler o conteúdo existente do arquivo de compras
 	content, err := os.ReadFile(filePathCompras)
@@ -131,6 +120,7 @@ func SalvarCompra(compra Compra) error {
 	return nil
 }
 
+//Ler arquivo de compras
 func LerCompras(cpf string) ([][]string, error) {
 	// Ler o conteúdo do arquivo de compras
 	content, err := os.ReadFile(filePathCompras)
@@ -194,6 +184,7 @@ func BuscarArquivosRotas() map[string][]Rota {
 	return rotas
 }
 
+//Cadastra novos usuários
 func CadastrarUsuario(novoUsuario User) error {
 	// Ler o conteúdo existente do arquivo
 	content, err := os.ReadFile(filePathUsers)
@@ -243,7 +234,7 @@ func CadastrarUsuario(novoUsuario User) error {
 
 	return nil
 }
-
+//Atualiza número de vagas após uma compra
 func AtualizarVagas(info Compra) {
 	for i := 0; i < len(info.Caminho); i++ { //percorre as cidades da rota
 		if i+1 != len(info.Caminho) { // verifica se a cidade atual não é o destino final
@@ -281,8 +272,7 @@ func AtualizarVagas(info Compra) {
 	}
 }
 
-// Verifica se há vagas nas rotas que o usuário deseja comprar
-// Depois é necessario subtrair o número de vagas
+// Verifica se há vagas nas rotas que o usuário deseja comprar e atualiza o número de vagas
 func ValidarCompra(info Compra) bool {
 	mu.Lock() // Bloqueia o mutex
 	defer mu.Unlock() // Garante que o mutex será desbloqueado ao final da função
@@ -309,17 +299,7 @@ func ValidarCompra(info Compra) bool {
 
 }
 
-// func Get() ([]byte, error) {
-// 	rotas := BuscarArquivosRotas()
-
-// 	jsonData, err := json.MarshalIndent(rotas, "", "  ")
-// 	if err != nil {
-// 		fmt.Println("Erro ao converter para JSON:", err)
-// 		return nil, err
-// 	}
-// 	return jsonData, nil
-// }
-
+//Conecta com usuário, recebe e envia mensagens
 func HandleConnection(conn net.Conn) {
 	defer conn.Close()
 	fmt.Println("Cliente conectado:", conn.RemoteAddr())
@@ -340,7 +320,7 @@ func HandleConnection(conn net.Conn) {
 	fmt.Println("Mensagem recebida do cliente:", dados)
 
 	switch dados.Request {
-	case ROTAS:
+	case ROTAS://solicitação de rotas
 		rotas := BuscarArquivosRotas()
 
 		jsonData, err := json.MarshalIndent(rotas, "", "  ")
@@ -351,7 +331,7 @@ func HandleConnection(conn net.Conn) {
 		conn.Write(jsonData)     // Envia os bytes diretamente
 		conn.Write([]byte("\n")) // Enviar uma nova linha para indicar o fim da mensagem
 
-	case COMPRA:
+	case COMPRA://Realiza compra caso tenha vagas disponíveis
 		if dados.DadosCompra == nil {
 			conn.Write([]byte("Dados de compra não fornecidos.\n"))
 			return
@@ -373,7 +353,7 @@ func HandleConnection(conn net.Conn) {
 		}
 
 		conn.Write([]byte("Sua compra foi " + result + "\n"))
-	case CADASTRO:
+	case CADASTRO://Cadastra novos usuários
 
 		if dados.DadosUsuario == nil {
 			conn.Write([]byte("Dados de usuário não fornecidos.\n"))
@@ -390,7 +370,7 @@ func HandleConnection(conn net.Conn) {
 		// Confirmar sucesso
 		conn.Write([]byte("Operação realizada com sucesso.\n"))
 
-	case LERCOMPRAS:
+	case LERCOMPRAS://Ler compras de um determinado usuário
 		if dados.DadosUsuario == nil {
 			conn.Write([]byte("Dados de usuário não fornecidos.\n"))
 			return
