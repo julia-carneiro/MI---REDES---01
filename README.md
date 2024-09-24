@@ -29,7 +29,7 @@ O servidor é responsável por gerenciar as seguintes funcionalidades:
 
 #### Cliente
 O cliente permite que os usuários:
-- Ver cidades disponíveis
+- Ver cidades disponíveis.
 - Consultem rotas.
 - Realize compra de passagens.
 - Consulte suas compras anteriores.
@@ -103,5 +103,31 @@ A experiência em trabalhar com algoritmos para busca de caminhos em grafos tamb
 
 Dessa maneira, conclui-se que a aplicação teve resultados positivos, cumprindo todos os requisitos solicitados no problema inicial.
 
+## Executando o programa
+Para conseguir interagir com o programa é necessário ter o Docker instalado na máquina, com isso, basta executar os seguintes comandos em um terminal: 
+```bash
+docker-compose up -d.
+```
+Depois que os containers são iniciados e estão rodando, abra um terminal para interagir com o cliente: 
+```bash
+docker exec -it cliente-container /bin/sh
+```
+Agora no terminal do container do cliente, execute:
+```bash
+/app/bin-container
+```
+Caso deseje ver os logs do servidor, execute em outro terminal:
+```bash
+docker logs servidor-container
+```
+Com esses passos feitos e funcionando normalmente, o usuário deve ser capaz de interagir facilmente com a aplicação. 
+
+Se algum erro acontecer no momento da execução desses comandos, é recomendado que limpe os caches e que os containers sejam deletados e criados novamente. 
+
+# Referências:
+
+Stateless x Stateful Disponível em: https://medium.com/exactaworks/stateless-vs-stateful-f596a6b6471d. Acesso em: 16 setembro 2024
+
+Protocolo TCP/IP. Disponível em: https://www.ibm.com/docs/pt-br/aix/7.3?topic=protocol-tcpip-protocols. Acesso em: 5 setembro 2024
 
 
