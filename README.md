@@ -114,7 +114,7 @@ docker exec -it cliente-container /bin/sh
 ```
 Agora no terminal do container do cliente, execute:
 ```bash
-/app/bin-container
+/app/bin-cliente
 ```
 Caso deseje ver os logs do servidor, execute em outro terminal:
 ```bash
