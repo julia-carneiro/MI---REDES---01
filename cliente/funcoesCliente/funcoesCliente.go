@@ -326,8 +326,15 @@ func Comprar(conn net.Conn, user User, origem string, destino string) {
 
 	if len(caminho_final) > 0 {
 		if vagas {
-			fmt.Printf("Rota encontrada - %s a %s: %v", origem, destino, caminho_final)//mostra a rota
+			fmt.Printf("Rota encontrada - %s a %s: ", origem, destino)//mostra a rota
+			for i := 0; i < len(caminho_final); i++ {
+				if(i+1 != len(caminho_final)){
 
+					fmt.Printf("%s-> ",caminho_final[i])
+				}else{
+					fmt.Printf("%s\n", caminho_final[i])
+				}
+			}
 			compra := Compra{
 				Cpf:     user.Cpf,
 				Caminho: caminho_final,
@@ -406,11 +413,27 @@ func VerPassagensCompradas(conn net.Conn, cpf string) {
 		return
 	}
 
-	response := string(buffer[:n])
+	var paths [][]string
+    err = json.Unmarshal(buffer[:n], &paths) // Desserializar para lista de listas
+    if err != nil {
+        fmt.Println("Erro ao desserializar a resposta do servidor:", err)
+        return
+    }
 	// Verificar se a resposta indica que há passagens compradas
-	if response != "null" {
+	if len(paths) != 0 {
 		fmt.Println("Passagens Compradas:")
-		fmt.Println(response)
+		for i := 0; i < len(paths); i++ {
+			fmt.Printf("Compra %d:\n",i+1)
+			for j := 0; j < len(paths[i]); j++ {
+				if(j+1 != len(paths[i])){
+
+					fmt.Printf("%s-> ",paths[i][j])
+				}else{
+					fmt.Printf("%s",paths[i][j])
+				}
+			}
+			fmt.Print("\n\n")
+		}
 	} else {
 		fmt.Println("Nenhuma passagem comprada")
 	}
