@@ -10,7 +10,7 @@ import (
 	
 )
 
-var ADRESS string = "servidor-container:22356"
+var ADRESS string = "172.16.103.4:22356"
 // type User struct {
 // 	Cpf  string `json:"Cpf"`
 // }

@@ -41,7 +41,7 @@
     },
     {
       "Destino": "Recife",
-      "Vagas": 3,
+      "Vagas": 2,
       "Peso": 10
     },
     {
@@ -70,7 +70,7 @@
   "Recife": [
     {
       "Destino": "São Paulo",
-      "Vagas": 10,
+      "Vagas": 9,
       "Peso": 20
     },
     {

@@ -47,9 +47,9 @@ type Rota struct {//Estrura de dados de uma rota
 }
 
 var rotas map[string][]Rota //Dicionário de rotas
-var filePathRotas = "/app/dados/rotas.json"//caminho para arquivo de rotas
-var filePathUsers = "/app/dados/users.json"//Caminho para arquivo de dados dos usuários
-var filePathCompras = "/app/dados/compras.json"//Caminho para arquivo de compras feitas
+var filePathRotas = "/app/servidor/dados/rotas.json"//caminho para arquivo de rotas
+var filePathUsers = "/app/servidor/dados/users.json"//Caminho para arquivo de dados dos usuários
+var filePathCompras = "/app/servidor/dados/compras.json"//Caminho para arquivo de compras feitas
 
 //Salva compra no arquivo de compras
 func SalvarCompra(compra Compra) error {
@@ -302,7 +302,7 @@ func ValidarCompra(info Compra) bool {
 //Conecta com usuário, recebe e envia mensagens
 func HandleConnection(conn net.Conn) {
 	defer conn.Close()
-	fmt.Println("Cliente conectado:", conn.RemoteAddr())
+	fmt.Println("\nCliente conectado:", conn.RemoteAddr())
 
 	message, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
@@ -317,7 +317,7 @@ func HandleConnection(conn net.Conn) {
 		return
 	}
 
-	fmt.Println("Mensagem recebida do cliente:", dados)
+	fmt.Println("\nMensagem recebida do cliente:", dados)
 
 	switch dados.Request {
 	case ROTAS://solicitação de rotas
