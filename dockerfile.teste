@@ -1,0 +1,29 @@
+# Etapa 1: Usar imagem oficial do Go para a construção
+FROM golang:1.23-alpine AS build
+
+# Definir o diretório de trabalho dentro do container
+WORKDIR /app
+
+# Copiar go.mod e go.sum para o diretório de trabalho no container
+COPY go.mod go.sum . 
+
+# Baixar as dependências do Go
+RUN go mod download
+
+# Copiar o código do projeto para dentro do container
+COPY ./testes /app/testes
+
+# Compilar o código de teste (opcional)
+# RUN go build -o /app/bin-teste ./testes/teste.go
+
+# Etapa 2: Construir o ambiente final de testes
+FROM golang:1.23-alpine
+
+# Definir o diretório de trabalho
+WORKDIR /app
+
+# Copiar os binários compilados ou o código-fonte
+COPY --from=build /app/testes /app/testes
+
+# Rodar os testes
+CMD ["go", "test", "./..."]

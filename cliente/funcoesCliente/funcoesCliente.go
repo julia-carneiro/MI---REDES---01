@@ -15,23 +15,23 @@ import (
 
 type Request int
 
-const (//Tipos de mensagens que podem ser enviadas ao servidor
+const ( //Tipos de mensagens que podem ser enviadas ao servidor
 	ROTAS Request = iota
 	COMPRA
 	CADASTRO
 	LERCOMPRAS
 )
 
-type Compra struct {//Estrutura de dados de compra
+type Compra struct { //Estrutura de dados de compra
 	Cpf     string
 	Caminho []string
 }
 
-type User struct {//Estrtura de dados de usuario
+type User struct { //Estrtura de dados de usuario
 	Cpf string `json:"Cpf"`
 }
 
-type Dados struct {//Estrutura de dados de mensagem para o servidor
+type Dados struct { //Estrutura de dados de mensagem para o servidor
 	Request      Request `json:"Request"`
 	DadosCompra  *Compra `json:"DadosCompra"`
 	DadosUsuario *User   `json:"DadosUsuario"`
@@ -47,7 +47,53 @@ type Rota struct {
 // Estrutura de dados para o grafo das rotas.
 var rotas map[string][]Rota
 
-//Função para vaalidar entrada do usuário
+func Teste(ADRESS string) {
+	//var caminho = []string{"Feira", "Brasília"}
+	user := User{Cpf: "12345678910"}
+
+	for {
+		conn := ConectarServidor(ADRESS)
+		Cadastrar(conn, user.Cpf)
+		BuscarDados(conn)
+		Comprar(conn, user, "Feira", "Brasília")
+		defer conn.Close()
+
+	}
+
+	// compra := Compra{
+	// 	Cpf:     user.Cpf,
+	// 	Caminho: caminho,
+	// }
+
+	// dados := Dados{
+	// 	Request:      COMPRA,
+	// 	DadosCompra:  &compra,
+	// 	DadosUsuario: nil,
+	// }
+
+	// //Converter dados para JSON
+	// jsonData, err := json.Marshal(dados)
+	// if err != nil {
+	// 	fmt.Println("Erro ao converter para JSON:", err)
+	// 	return
+	// }
+
+	// // // Enviar o JSON ao servidor
+	// // fmt.Println("Enviando dados:", string(jsonData)) // Exibe o JSON como string
+	// conn.Write(jsonData)
+	// conn.Write([]byte("\n")) // Enviar uma nova linha para indicar o fim da mensagem
+
+	// // Ler a resposta do servidor
+	// buffer := make([]byte, 1024)
+	// n, err := conn.Read(buffer)
+	// if err != nil {
+	// 	fmt.Println("Erro ao ler a resposta do servidor:", err)
+	// 	return
+	// }
+	// fmt.Println("Resposta do servidor:", string(buffer[:n]))
+}
+
+// Função para vaalidar entrada do usuário
 func ValidarCPF(s string) bool {
 	// Verifica se a string tem exatamente 11 caracteres
 	if len(s) != 11 {
@@ -64,7 +110,7 @@ func ValidarCPF(s string) bool {
 	return true
 }
 
-//Transforam a todas as letras da string em minusculas menos a primeira letra de cada palavra
+// Transforam a todas as letras da string em minusculas menos a primeira letra de cada palavra
 func capitalizeWords(s string) string {
 	words := strings.Fields(s) // Divide a string em palavras
 	for i, word := range words {
@@ -80,19 +126,18 @@ func capitalizeWords(s string) string {
 	return strings.Join(words, " ") // Junta as palavras novamente
 }
 
-
-//Verifica se a vagas em uma determinada rota
+// Verifica se a vagas em uma determinada rota
 func VerificarVagas(caminho []string) bool {
 	CompraValida := false
 	for i := 0; i < len(caminho); i++ { //percorre as cidades da rota
 		if i+1 != len(caminho) { // verifica se a cidade atual não é o destino final
 			for j := 0; j < len(rotas[caminho[i]]); j++ { // percorre as cidades que a cidade atual faz rota
 				if rotas[caminho[i]][j].Destino == caminho[i+1] { // verifica a rota é a rota desejada
-					if rotas[caminho[i]][j].Vagas > 0 {// caso seja a rota desejada verifica se há vagas
+					if rotas[caminho[i]][j].Vagas > 0 { // caso seja a rota desejada verifica se há vagas
 						CompraValida = true
 					} else {
 						CompraValida = false
-						return CompraValida//caso uma das rotas não tenha vaga retorna false
+						return CompraValida //caso uma das rotas não tenha vaga retorna false
 					}
 				}
 			}
@@ -102,7 +147,7 @@ func VerificarVagas(caminho []string) bool {
 
 }
 
-type Caminho struct {//estrtura que guarda caminho
+type Caminho struct { //estrtura que guarda caminho
 	Cidades []string
 	Peso    int
 }
@@ -150,16 +195,17 @@ func contem(caminho []string, cidade string) bool {
 	}
 	return false
 }
+
 // Função para printar as cidades que é possível viajar
-func VerCidades(){
+func VerCidades() {
 	fmt.Print("Cidades possíveis para viajar:\n")
-	for cidade,_ := range rotas{
-		fmt.Printf("%s\n",cidade)
+	for cidade := range rotas {
+		fmt.Printf("%s\n", cidade)
 
 	}
 }
 
-//Menu do sistema
+// Menu do sistema
 func Menu(ADRESS string, user User) {
 	var operacao int
 	var conn net.Conn
@@ -172,7 +218,7 @@ func Menu(ADRESS string, user User) {
 		fmt.Scanf("%d\n", &operacao)
 
 		switch operacao {
-		case 1:// Fazer compra
+		case 1: // Fazer compra
 			// Lendo entrada do usuário
 			var origem, destino string
 			reader := bufio.NewReader(os.Stdin)
@@ -212,17 +258,17 @@ func Menu(ADRESS string, user User) {
 				fmt.Println("Não existe rota")
 			}
 
-		case 2:// Ver compras anteriores
+		case 2: // Ver compras anteriores
 			conn = ConectarServidor(ADRESS)
 			VerPassagensCompradas(conn, user.Cpf)
 			defer conn.Close()
-		case 3://Ver cidades que é possível viajar
+		case 3: //Ver cidades que é possível viajar
 			conn = ConectarServidor(ADRESS)
 			BuscarDados(conn)
 			defer conn.Close()
 			VerCidades()
-			
-		case 4://Sair do sistema
+
+		case 4: //Sair do sistema
 			i = false
 			break
 		default:
@@ -232,7 +278,8 @@ func Menu(ADRESS string, user User) {
 	}
 
 }
-//Conecta com o servidor
+
+// Conecta com o servidor
 func ConectarServidor(ADRESS string) net.Conn {
 	// Conectando ao servidor na porta 8080
 	conn, err := net.Dial("tcp", ADRESS)
@@ -244,9 +291,9 @@ func ConectarServidor(ADRESS string) net.Conn {
 	return conn
 }
 
-//Solicita ao servidor as rotas,pesos e vagas
+// Solicita ao servidor as rotas,pesos e vagas
 func BuscarDados(conn net.Conn) {
-	dados := Dados{//estrutura da mensagem enviada para o servidor
+	dados := Dados{ //estrutura da mensagem enviada para o servidor
 		Request:      ROTAS,
 		DadosCompra:  nil,
 		DadosUsuario: nil,
@@ -283,7 +330,7 @@ func BuscarDados(conn net.Conn) {
 	// fmt.Println("Dados convertidos:", rotas)
 }
 
-//cadastra o usuário
+// cadastra o usuário
 func Cadastrar(conn net.Conn, cpf string) {
 	user := User{
 		Cpf: cpf,
@@ -306,12 +353,12 @@ func Cadastrar(conn net.Conn, cpf string) {
 	conn.Write(jsonData)
 	conn.Write([]byte("\n")) // Enviar uma nova linha para indicar o fim da mensagem
 
-
 }
-//Função de compra
+
+// Função de compra
 func Comprar(conn net.Conn, user User, origem string, destino string) {
 	var caminho_final []string
-	var caminhos []Caminho = BuscarTodosCaminhos(origem, destino)// busca todos os caminho possiveis
+	var caminhos []Caminho = BuscarTodosCaminhos(origem, destino) // busca todos os caminho possiveis
 	var vagas = false
 
 	//verifica se o menor caminho encontrado possui vagas, caso não tenha procura nos proximos menores caminhos
@@ -326,12 +373,12 @@ func Comprar(conn net.Conn, user User, origem string, destino string) {
 
 	if len(caminho_final) > 0 {
 		if vagas {
-			fmt.Printf("Rota encontrada - %s a %s: ", origem, destino)//mostra a rota
+			fmt.Printf("Rota encontrada - %s a %s: ", origem, destino) //mostra a rota
 			for i := 0; i < len(caminho_final); i++ {
-				if(i+1 != len(caminho_final)){
+				if i+1 != len(caminho_final) {
 
-					fmt.Printf("%s-> ",caminho_final[i])
-				}else{
+					fmt.Printf("%s-> ", caminho_final[i])
+				} else {
 					fmt.Printf("%s\n", caminho_final[i])
 				}
 			}
@@ -381,7 +428,8 @@ func Comprar(conn net.Conn, user User, origem string, destino string) {
 
 	}
 }
-//Exibe as passagens compradas
+
+// Exibe as passagens compradas
 func VerPassagensCompradas(conn net.Conn, cpf string) {
 	// Preparar a solicitação para ler as compras
 	user := User{
@@ -414,22 +462,22 @@ func VerPassagensCompradas(conn net.Conn, cpf string) {
 	}
 
 	var paths [][]string
-    err = json.Unmarshal(buffer[:n], &paths) // Desserializar para lista de listas
-    if err != nil {
-        fmt.Println("Erro ao desserializar a resposta do servidor:", err)
-        return
-    }
+	err = json.Unmarshal(buffer[:n], &paths) // Desserializar para lista de listas
+	if err != nil {
+		fmt.Println("Erro ao desserializar a resposta do servidor:", err)
+		return
+	}
 	// Verificar se a resposta indica que há passagens compradas
 	if len(paths) != 0 {
 		fmt.Println("Passagens Compradas:")
 		for i := 0; i < len(paths); i++ {
-			fmt.Printf("Compra %d:\n",i+1)
+			fmt.Printf("Compra %d:\n", i+1)
 			for j := 0; j < len(paths[i]); j++ {
-				if(j+1 != len(paths[i])){
+				if j+1 != len(paths[i]) {
 
-					fmt.Printf("%s-> ",paths[i][j])
-				}else{
-					fmt.Printf("%s",paths[i][j])
+					fmt.Printf("%s-> ", paths[i][j])
+				} else {
+					fmt.Printf("%s", paths[i][j])
 				}
 			}
 			fmt.Print("\n\n")

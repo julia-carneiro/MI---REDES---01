@@ -25,6 +25,14 @@ services:
 
     networks:
       - app-network
+    
+  # teste:
+  #   build:
+  #     context: .
+  #     dockerfile: dockerfile.teste
+  #   container_name: teste-container
+  #   networks:
+  #     - app-network
 
 networks:
   app-network:
