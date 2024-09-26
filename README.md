@@ -106,7 +106,7 @@ Dessa maneira, conclui-se que a aplicação teve resultados positivos, cumprindo
 ## Executando o programa
 Para conseguir interagir com o programa é necessário ter o Docker instalado na máquina, com isso, basta executar os seguintes comandos em um terminal: 
 ```bash
-docker-compose up -d.
+docker-compose up --build -d.
 ```
 Depois que os containers são iniciados e estão rodando, abra um terminal para interagir com o cliente: 
 ```bash
